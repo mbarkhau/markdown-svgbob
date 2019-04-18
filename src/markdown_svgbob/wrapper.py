@@ -37,13 +37,14 @@ def _get_usr_bin_path() -> typ.Optional[pl.Path]:
 
 
 def _get_pkg_bin_path() -> pl.Path:
+    # https://pymotw.com/3/platform/
     osname  = platform.system()
     machine = platform.machine()
 
-    bin_fname = f"svgbob_{machine}-{osname}"
-    bin_fpath = PKG_BIN_DIR / bin_fname
-    if bin_fpath.exists():
-        return bin_fpath
+    glob_expr = f"*_{machine}-{osname}"
+    bin_files = list(PKG_BIN_DIR.glob(glob_expr))
+    if bin_files:
+        return max(bin_files)
 
     err_msg = (
         f"Platform not supported, "
