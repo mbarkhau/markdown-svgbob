@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 import os
+import sys
 import setuptools
 
 
@@ -59,7 +60,7 @@ setuptools.setup(
     packages=["markdown_svgbob"],
     package_dir=package_dir,
     install_requires=install_requires,
-    python_requires=">=3.6",
+    python_requires=">=2.7",
     zip_safe=True,
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers

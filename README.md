@@ -30,7 +30,6 @@ Code Quality/CI:
 
 ```bash
 $ pip install markdown-svgbob
-$ pip install Pillow    # only for any format other than svg
 ```
 
 The library currently only has built-in support for `x86_64-Linux`. If

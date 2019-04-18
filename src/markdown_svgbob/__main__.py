@@ -6,7 +6,9 @@
 # SPDX-License-Identifier: MIT
 import os
 import sys
-import markdown_svgbob
+import subprocess as sp
+
+import markdown_svgbob as mdsvg
 
 
 # To enable pretty tracebacks:
@@ -37,7 +39,7 @@ ExitCode = int
 
 
 def _selftest() -> ExitCode:
-    svg_data = markdown_svgbob.text2svg(TEST_IMAGE)
+    svg_data = mdsvg.text2svg(TEST_IMAGE)
     if not svg_data:
         return 1
 
@@ -53,13 +55,13 @@ def main(args=sys.argv[1:]) -> ExitCode:
 
     This is mostly just used for self testing.
     """
-    if "--pysvgbob-selftest" in args:
+    if "--markdown-svgbob-selftest" in args:
         return _selftest()
 
     if "--version" in args or "-V" in args:
-        print(f"markdown-svgbob version: ", markdown_svgbob.__version__)
+        print(f"markdown-svgbob version: ", mdsvg.__version__)
 
-    binpath = markdown_svgbob.get_svgbob_bin_path()
+    binpath = mdsvg.get_svgbob_bin_path()
     return sp.call([binpath] + args)
 
 
