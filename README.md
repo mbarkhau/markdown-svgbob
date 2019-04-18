@@ -3,6 +3,8 @@
 This is an extension for [Python Markdown](https://python-markdown.github.io/)
 which renders diagrams using [svgbob](https://github.com/ivanceras/svgbob).
 
+You can try it out using the [Svgbob Editor](https://ivanceras.github.io/svgbob-editor/).
+
 Project/Repo:
 
 [![MIT License][license_img]][license_ref]
@@ -45,6 +47,25 @@ In your markdown text you can define the block:
 
     ```svgbob
     ```
+
+## Development/Testing
+
+```bash
+$ git clone https://gitlab.com/mbarkhau/markdown_aafigure
+$ cd markdown_aafigure
+$ make install
+$ make lint mypy test
+```
+
+## MkDocs Integration
+
+In your `mkdocs.yml` add this to markdown_extensions.
+
+```yaml
+markdown_extensions:
+  - markdown_svgbob:
+      format: svg
+```
 
 [repo_ref]: https://gitlab.com/mbarkhau/markdown-svgbob
 

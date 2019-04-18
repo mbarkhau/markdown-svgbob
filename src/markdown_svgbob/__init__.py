@@ -3,6 +3,12 @@
 #
 # Copyright (c) 2019 Manuel Barkhau (mbarkhau@gmail.com) - MIT License
 # SPDX-License-Identifier: MIT
+"""markdown_svgbob extension.
+
+This is an extension for the python Markdown
+libarary which uses svgbob to generate images
+from ascii diagrams in fenced code blocks.
+"""
 
 import os
 import platform
@@ -14,7 +20,7 @@ import subprocess as sp
 __version__ = "v201904.0001-alpha"
 
 
-LIBDIR          = pl.Path(__file__).parent
+LIBDIR: pl.Path = pl.Path(__file__).parent
 PKG_BIN_DIR     = LIBDIR / "bin"
 DEFAULT_BIN_DIR = pl.Path("~") / ".cargo" / "bin"
 DEFAULT_BIN_DIR = DEFAULT_BIN_DIR.expanduser()

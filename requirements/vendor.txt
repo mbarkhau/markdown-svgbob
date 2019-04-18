@@ -21,3 +21,5 @@
 #    packages, simply by not including the vendor/ directory in
 #    the PYTHONPATH. The version from the virtualenv will then
 #    be loaded instead.
+
+pathlib2
