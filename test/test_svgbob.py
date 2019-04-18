@@ -13,14 +13,21 @@ from __future__ import unicode_literals
 from xml.sax.saxutils import unescape
 
 from markdown import markdown
-import markdown_svgbob
-import markdown_svgbob.wrapper
-import markdown_svgbob.extension as ext
 
-import pytest
+import markdown_svgbob
+import markdown_svgbob.wrapper as wrp
+import markdown_svgbob.extension as ext
 
 
 BASIC_FIG_TXT = r"""
+       .---.
+      /-o-/--
+   .-/ / /->
+  ( *  \/
+   '-.  \
+      \ /
+       '
+                                                  .
  +------+   .------.    .------.      /\        .' `.
  |      |   |      |   (        )    /  \     .'     `.
  +------+   '------'    '------'    '----'     `.   .'
@@ -33,7 +40,9 @@ BASIC_FIG_TXT = r"""
  (             )     (      )    (     )          \  \
   '-----+ ,---'       `>   '      `  <'            \  v
         |/
-""".strip()
+""".strip(
+    "\n"
+)
 
 
 BASIC_BLOCK_TXT = "```svgbob\n" + BASIC_FIG_TXT + "```"
@@ -51,11 +60,13 @@ EXTENDED_BLOCK_TXT = """
 prelude
 
 ```svgbob
-{}
+{0}
 ```
 
 postscript
-""".format(BASIC_FIG_TXT)
+"""
+
+EXTENDED_BLOCK_TXT = EXTENDED_BLOCK_TXT.format(BASIC_FIG_TXT)
 
 
 EXTENDED_HTML_TEMPLATE = r"""
@@ -64,6 +75,27 @@ EXTENDED_HTML_TEMPLATE = r"""
 <p><img src='{}' /></p>
 <p>postscript</p>
 """
+
+
+HTMLTEST_TXT = """
+# Heading
+
+prelude
+
+```svgbob {"data_uri_encoding":"base64"}
+<figtxt>
+```
+
+interlude
+
+```svgbob {"data_uri_encoding":"utf-8"}
+<figtxt>
+```
+
+postscript
+"""
+
+HTMLTEST_TXT = HTMLTEST_TXT.replace("<figtxt>", BASIC_FIG_TXT)
 
 
 def test_regexp():
@@ -79,9 +111,13 @@ def test_basic_svg():
     assert b"<svg" in fig_data
     assert b"</svg>" in fig_data
 
-    img_uri = ext.draw_svgbob(BASIC_BLOCK_TXT)
+    img_uri_b64 = ext.draw_svgbob(BASIC_BLOCK_TXT, default_options={'data_uri_encoding': "base64"})
+    img_uri     = ext.draw_svgbob(BASIC_BLOCK_TXT)
+    assert img_uri == img_uri_b64
     assert img_uri.startswith("data:image/svg+xml;base64,")
     expected = "<p><img src='{}' /></p>".format(img_uri)
+
+    assert "xmlns" not in img_uri
 
     result = markdown(BASIC_BLOCK_TXT, extensions=['markdown_svgbob'])
 
@@ -94,6 +130,13 @@ def test_determinism_svg():
     fig_data1 = markdown_svgbob.text2svg(BASIC_FIG_TXT)
     fig_data2 = markdown_svgbob.text2svg(BASIC_FIG_TXT)
     assert fig_data1 == fig_data2
+
+
+def test_uri_encoding():
+    fig_data = markdown_svgbob.text2svg(BASIC_FIG_TXT)
+
+    img_uri = ext.draw_svgbob(BASIC_BLOCK_TXT, default_options={'data_uri_encoding': "utf-8"})
+    assert "xmlns" in img_uri
 
 
 def test_svgbob_options():
@@ -130,8 +173,6 @@ def test_extended_svgbob():
 
 
 def test_options_parsing():
-    wrp = markdown_svgbob.wrapper
-
     default_options = wrp._parse_options_help_text(wrp.DEFAULT_HELP_TEXT)
 
     expected_option_keys = {"font-family", "font-size", "scale", "stroke-width"}
@@ -146,3 +187,19 @@ def test_options_parsing():
     assert set(options.keys()) >= expected_option_keys
 
     assert "output" not in options
+
+
+def test_bin_paths():
+    assert wrp._get_pkg_bin_path().exists()
+    assert wrp._get_pkg_bin_path(machine="x86_64", osname="Windows").exists()
+    assert wrp._get_pkg_bin_path(machine="x86_64", osname="Linux").exists()
+    assert wrp._get_pkg_bin_path(machine="x86_64", osname="Darwin").exists()
+
+
+def test_html_output():
+    # NOTE: This generates html that is to be tested
+    #   in the browser (for warnings in devtools).
+    extensions = DEFAULT_MKDOCS_EXTENSIONS + ['markdown_svgbob']
+    result     = markdown(HTMLTEST_TXT, extensions=extensions)
+    with open("/tmp/svgbob.html", mode="w") as fh:
+        fh.write(result)

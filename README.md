@@ -45,6 +45,13 @@ $ cargo install svgbob_cli
 In your markdown text you can define the block:
 
     ```svgbob
+             .---.
+        /-o-/--
+     .-/ / /->
+    ( *  \/
+     '-.  \
+        \ /
+         '
     ```
 
 ## Development/Testing
@@ -56,6 +63,7 @@ $ make install
 $ make lint mypy test
 ```
 
+
 ## MkDocs Integration
 
 In your `mkdocs.yml` add this to markdown_extensions.
@@ -63,8 +71,11 @@ In your `mkdocs.yml` add this to markdown_extensions.
 ```yaml
 markdown_extensions:
   - markdown_svgbob:
-      format: svg
+      data_uri_encoding: utf-8
 ```
+
+Valid options for `data_uri_encoding` are `utf-8` and `base64`.
+
 
 [repo_ref]: https://gitlab.com/mbarkhau/markdown-svgbob
 

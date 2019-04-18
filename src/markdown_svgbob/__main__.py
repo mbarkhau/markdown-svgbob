@@ -6,6 +6,7 @@
 # SPDX-License-Identifier: MIT
 import os
 import sys
+import typing as typ
 import subprocess as sp
 
 import markdown_svgbob as mdsvg
@@ -50,7 +51,7 @@ def _selftest() -> ExitCode:
     return 0
 
 
-def main(args=sys.argv[1:]) -> ExitCode:
+def main(args: typ.List[str] = sys.argv[1:]) -> ExitCode:
     """Basic wrapper around the svgbob command.
 
     This is mostly just used for self testing.
@@ -62,7 +63,7 @@ def main(args=sys.argv[1:]) -> ExitCode:
         print(f"markdown-svgbob version: ", mdsvg.__version__)
 
     binpath = mdsvg.get_svgbob_bin_path()
-    return sp.call([binpath] + args)
+    return sp.call([str(binpath)] + args)
 
 
 if __name__ == '__main__':

@@ -17,7 +17,7 @@ from markdown_svgbob.extension import SvgbobExtension
 from markdown_svgbob.wrapper import text2svg, get_svgbob_bin_path
 
 
-def makeExtension(**kwargs):
+def makeExtension(**kwargs) -> SvgbobExtension:
     return SvgbobExtension(**kwargs)
 
 

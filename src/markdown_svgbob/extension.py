@@ -8,6 +8,11 @@ import json
 import base64
 import typing as typ
 
+try:
+    from urllib.parse import quote
+except ImportError:
+    from urllib import quote  # type: ignore
+
 from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
 from markdown.postprocessors import Postprocessor
@@ -15,23 +20,18 @@ from markdown.postprocessors import Postprocessor
 import markdown_svgbob.wrapper as wrapper
 
 
-# TODO: parameterise mime and encoding options
-
-
-def svg2img_uri(svg_data: bytes) -> str:
-    mime     = "image/svg+xml"
-    encoding = "base64"
-
+def svg2img_uri(svg_data: bytes, encoding: str = 'base64') -> str:
     if encoding == 'base64':
         img_b64_data: bytes = base64.standard_b64encode(svg_data)
         img_text = img_b64_data.decode('ascii')
     elif encoding == 'utf-8':
         img_text = svg_data.decode("utf-8")
+        img_text = quote(img_text.replace("\n", ""))
     else:
         err_msg = f"Invalid encoding='{encoding}'"
         raise NotImplementedError(err_msg)
 
-    return f"data:{mime};{encoding},{img_text}"
+    return f"data:image/svg+xml;{encoding},{img_text}"
 
 
 def draw_svgbob(block_text: str, default_options: wrapper.Options = None) -> str:
@@ -51,8 +51,11 @@ def draw_svgbob(block_text: str, default_options: wrapper.Options = None) -> str
         options.update(json.loads(header))
         block_text = rest
 
+    data_uri_encoding = typ.cast(str, options.pop('data_uri_encoding', "base64"))
+
     svg_data = wrapper.text2svg(block_text, options)
-    return svg2img_uri(svg_data)
+
+    return svg2img_uri(svg_data, encoding=data_uri_encoding)
 
 
 class SvgbobExtension(Extension):

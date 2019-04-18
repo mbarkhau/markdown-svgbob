@@ -19,10 +19,15 @@ DEFAULT_BIN_DIR = DEFAULT_BIN_DIR.expanduser()
 
 def _get_usr_bin_path() -> typ.Optional[pl.Path]:
     env_path = os.environ.get('PATH')
-    if env_path is None:
-        env_paths = [DEFAULT_BIN_DIR]
-    else:
-        env_paths = [pl.Path(path_str) for path_str in env_path.split(os.pathsep)]
+    env_paths: typ.List[pl.Path] = []
+
+    if env_path:
+        path_strs = env_path.split(os.pathsep)
+        env_paths.extend([pl.Path(p) for p in path_strs])
+
+    # search in ~/.cargo/bin regardless of path
+    if DEFAULT_BIN_DIR not in env_paths:
+        env_paths.append(DEFAULT_BIN_DIR)
 
     for path in env_paths:
         local_bin = path / "svgbob"
@@ -36,11 +41,12 @@ def _get_usr_bin_path() -> typ.Optional[pl.Path]:
     return None
 
 
-def _get_pkg_bin_path() -> pl.Path:
-    # https://pymotw.com/3/platform/
-    osname  = platform.system()
-    machine = platform.machine()
+# https://pymotw.com/3/platform/
+OSNAME  = platform.system()
+MACHINE = platform.machine()
 
+
+def _get_pkg_bin_path(osname: str = OSNAME, machine: str = MACHINE) -> pl.Path:
     glob_expr = f"*_{machine}-{osname}"
     bin_files = list(PKG_BIN_DIR.glob(glob_expr))
     if bin_files:
@@ -65,8 +71,10 @@ def get_svgbob_bin_path() -> pl.Path:
 
 
 def read_output(proc: sp.Popen) -> typ.Iterable[bytes]:
+    buf: typ.IO[bytes] = proc.stdout
+
     while True:
-        output = proc.stdout.readline()
+        output = buf.readline()
         if output:
             yield output
         else:
