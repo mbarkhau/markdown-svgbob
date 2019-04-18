@@ -47,8 +47,8 @@ def _get_pkg_bin_path() -> pl.Path:
         return max(bin_files)
 
     err_msg = (
-        f"Platform not supported, "
-        f"svgbob binary not found {bin_fpath}. "
+        "Platform not supported, "
+        "svgbob binary not found. "
         "Install manually using "
         "'cargo install svgbob'."
     )
