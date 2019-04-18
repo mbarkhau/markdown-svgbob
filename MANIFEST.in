@@ -2,4 +2,4 @@ include LICENSE
 include README.md
 include CHANGELOG.md
 include requirements/pypi.txt
-inlcude src/markdown_svgbob/bin/*
+include src/markdown_svgbob/bin/*
