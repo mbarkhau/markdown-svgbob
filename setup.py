@@ -59,6 +59,12 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     packages=["markdown_svgbob"],
     package_dir=package_dir,
+    package_data={
+        "markdown_svgbob": [
+            os.path.join("bin", "svgbob_*"),
+        ],
+    },
+    include_package_data=True,
     install_requires=install_requires,
     python_requires=">=2.7",
     zip_safe=True,
