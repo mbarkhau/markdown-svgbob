@@ -20,23 +20,27 @@ from markdown.postprocessors import Postprocessor
 import markdown_svgbob.wrapper as wrapper
 
 
-def svg2img_uri(svg_data: bytes, encoding: str = 'base64') -> str:
-    if encoding == 'base64':
-        img_b64_data: bytes = base64.standard_b64encode(svg_data)
-        img_text = img_b64_data.decode('ascii')
-    elif encoding == 'utf-8':
-        img_text = svg_data.decode("utf-8")
-        img_text = quote(img_text.replace("\n", ""))
+def svg2html(svg_data: bytes, tag_type: str = 'inline_svg') -> str:
+    svg_data = svg_data.replace(b"\n", b"")
+    if tag_type in ('img_base64_svg', 'img_utf8_svg'):
+        if tag_type == 'img_base64_svg':
+            img_b64_data: bytes = base64.standard_b64encode(svg_data)
+            img_text = img_b64_data.decode('ascii')
+            return f'<img src="data:image/svg+xml;base64,{img_text}" />'
+        else:
+            img_text = svg_data.decode("utf-8")
+            img_text = quote(img_text.replace("\n", ""))
+            return f'<img src="data:image/svg+xml;utf-8,{img_text}" />'
+    elif tag_type == 'inline_svg':
+        return svg_data.decode("utf-8")
     else:
-        err_msg = f"Invalid encoding='{encoding}'"
+        err_msg = f"Invalid tag_type='{tag_type}'"
         raise NotImplementedError(err_msg)
 
-    return f"data:image/svg+xml;{encoding},{img_text}"
 
-
-def draw_svgbob(block_text: str, default_options: wrapper.Options = None) -> str:
-    if block_text.startswith("```svgbob"):
-        block_text = block_text[len("```svgbob") :]
+def draw_bob(block_text: str, default_options: wrapper.Options = None) -> str:
+    if block_text.startswith("```bob"):
+        block_text = block_text[len("```bob") :]
     if block_text.endswith("```"):
         block_text = block_text[: -len("```")]
 
@@ -51,11 +55,10 @@ def draw_svgbob(block_text: str, default_options: wrapper.Options = None) -> str
         options.update(json.loads(header))
         block_text = rest
 
-    data_uri_encoding = typ.cast(str, options.pop('data_uri_encoding', "base64"))
+    tag_type = typ.cast(str, options.pop('tag_type', 'inline_svg'))
 
     svg_data = wrapper.text2svg(block_text, options)
-
-    return svg2img_uri(svg_data, encoding=data_uri_encoding)
+    return svg2html(svg_data, tag_type=tag_type)
 
 
 class SvgbobExtension(Extension):
@@ -78,7 +81,7 @@ class SvgbobExtension(Extension):
 
 class SvgbobPreprocessor(Preprocessor):
 
-    RE = re.compile(r"^```svgbob")
+    RE = re.compile(r"^```bob")
 
     def __init__(self, md, ext: SvgbobExtension) -> None:
         super(SvgbobPreprocessor, self).__init__(md)
@@ -90,7 +93,7 @@ class SvgbobPreprocessor(Preprocessor):
         block_lines: typ.List[str] = []
 
         default_options: wrapper.Options = {
-            # output_fmt: str = self.ext.getConfig('format', 'svg')
+            'tag_type': self.ext.getConfig('tag_type', 'inline_svg')
         }
 
         for line in lines:
@@ -102,10 +105,10 @@ class SvgbobPreprocessor(Preprocessor):
                 is_in_fence = False
                 block_text  = "\n".join(block_lines)
                 del block_lines[:]
-                img_uri    = draw_svgbob(block_text, default_options)
-                img_uri_id = id(img_uri)
-                marker     = f"<p id='svgbob{img_uri_id}'>svgbob{img_uri_id}</p>"
-                tag_text   = f"<p><img src='{img_uri}' /></p>"
+                img_tag  = draw_bob(block_text, default_options)
+                img_id   = id(img_tag)
+                marker   = f"<p id='svgbob{img_id}'>svgbob{img_id}</p>"
+                tag_text = f"<p>{img_tag}</p>"
                 out_lines.append(marker)
                 self.ext.images[marker] = tag_text
             elif self.RE.match(line):

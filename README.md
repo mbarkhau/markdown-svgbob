@@ -32,19 +32,25 @@ Code Quality/CI:
 $ pip install markdown-svgbob
 ```
 
-The library currently only has built-in support for `x86_64-Linux`. If
-you are on another platform, you will need to install rust and then svgbob via cargo. 
+This package includes the following binaries:
+
+ - `svgbob_0.4.1_x86_64-Darwin`
+ - `svgbob_0.4.1_x86_64-Linux`
+ - `svgbob_0.4.1_x86_64-Windows`
+
+If you are on another platform, or want to use a more recent version of `svgbob_cli`, you will need to install rust and then svgbob via cargo.
 
 ```bash
 $ curl https://sh.rustup.rs -sSf | sh   # see https://rustup.rs/
 $ cargo install svgbob_cli
 ```
 
-## Use
+
+## Usage
 
 In your markdown text you can define the block:
 
-    ```svgbob
+    ```bob
              .---.
         /-o-/--
      .-/ / /->
@@ -54,11 +60,14 @@ In your markdown text you can define the block:
          '
     ```
 
+The info string `bob` is chosen to match [spongedown](https://github.com/ivanceras/spongedown).
+
+
 ## Development/Testing
 
 ```bash
-$ git clone https://gitlab.com/mbarkhau/markdown_aafigure
-$ cd markdown_aafigure
+$ git clone https://gitlab.com/mbarkhau/markdown-svgbob
+$ cd markdown-svgbob
 $ make install
 $ make lint mypy test
 ```
@@ -71,10 +80,10 @@ In your `mkdocs.yml` add this to markdown_extensions.
 ```yaml
 markdown_extensions:
   - markdown_svgbob:
-      data_uri_encoding: utf-8
+      tag_type: inline_svg
 ```
 
-Valid options for `data_uri_encoding` are `utf-8` and `base64`.
+Valid options for `tag_type` are `inline_svg` (the default), `img_utf8_svg` and `img_base64_svg`.
 
 
 [repo_ref]: https://gitlab.com/mbarkhau/markdown-svgbob

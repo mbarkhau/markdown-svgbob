@@ -20,35 +20,35 @@ import markdown_svgbob.extension as ext
 
 
 BASIC_FIG_TXT = r"""
-       .---.
-      /-o-/--
-   .-/ / /->
-  ( *  \/
-   '-.  \
-      \ /
-       '
-                                                  .
- +------+   .------.    .------.      /\        .' `.
- |      |   |      |   (        )    /  \     .'     `.
- +------+   '------'    '------'    '----'     `.   .'
-   _______            ________                   `.'   ^ /
-  /       \      /\   \       \      ---->    | ^     / /
- /         \    /  \   )       )     <----    | |    / v
- \         /    \  /  /_______/               v |
+       .---.                      .
+      /-o-/--         /\        .' `.
+   .-/ / /->         /  \     .'     `.
+  ( *  \/           '----'     `.   .'
+   '-.  \                        `.'   ^ /
+      \ /            ---->    | ^     / /
+       '             <----    | |    / v
+                              v |
+ +------+   .------.    .------.    ^  \
+ |      |   |      |   (        )    \  \
+ +------+   '------'    '------'      \  v
+   _______            ________
+  /       \      /\   \       \
+ /         \    /  \   )       )
+ \         /    \  /  /_______/
   \_______/      \/
-  .-----------.       .   <.      .>  .          ^  \
- (             )     (      )    (     )          \  \
-  '-----+ ,---'       `>   '      `  <'            \  v
+  .-----------.       .   <.      .>  .
+ (             )     (      )    (     )
+  '-----+ ,---'       `>   '      `  <'
         |/
 """.strip(
     "\n"
 )
 
 
-BASIC_BLOCK_TXT = "```svgbob\n" + BASIC_FIG_TXT + "```"
+BASIC_BLOCK_TXT = "```bob\n" + BASIC_FIG_TXT + "```"
 
 
-OPTIONS_BLOCK_TXT = '```svgbob {"stroke-width": 4}\n' + BASIC_FIG_TXT + "```"
+OPTIONS_BLOCK_TXT = '```bob {"stroke-width": 4}\n' + BASIC_FIG_TXT + "```"
 
 
 DEFAULT_MKDOCS_EXTENSIONS = ['meta', 'toc', 'tables', 'fenced_code']
@@ -59,7 +59,7 @@ EXTENDED_BLOCK_TXT = """
 
 prelude
 
-```svgbob
+```bob
 {0}
 ```
 
@@ -72,7 +72,7 @@ EXTENDED_BLOCK_TXT = EXTENDED_BLOCK_TXT.format(BASIC_FIG_TXT)
 EXTENDED_HTML_TEMPLATE = r"""
 <h1 id="heading">Heading</h1>
 <p>prelude</p>
-<p><img src='{}' /></p>
+<p>{}</p>
 <p>postscript</p>
 """
 
@@ -82,13 +82,19 @@ HTMLTEST_TXT = """
 
 prelude
 
-```svgbob {"data_uri_encoding":"base64"}
+```bob {"tag_type":"img_utf8_svg"}
 <figtxt>
 ```
 
 interlude
 
-```svgbob {"data_uri_encoding":"utf-8"}
+```bob {"tag_type":"img_base64_svg", "stroke-width": 1.5}
+<figtxt>
+```
+
+interlude
+
+```bob {"tag_type":"inline_svg", "stroke-width": 2.5}
 <figtxt>
 ```
 
@@ -102,6 +108,12 @@ def test_regexp():
     assert ext.SvgbobPreprocessor.RE.match(BASIC_BLOCK_TXT)
 
 
+def test_determinism_svg():
+    fig_data1 = markdown_svgbob.text2svg(BASIC_FIG_TXT)
+    fig_data2 = markdown_svgbob.text2svg(BASIC_FIG_TXT)
+    assert fig_data1 == fig_data2
+
+
 def test_basic_svg():
     fig_data = markdown_svgbob.text2svg(BASIC_FIG_TXT)
 
@@ -111,32 +123,46 @@ def test_basic_svg():
     assert b"<svg" in fig_data
     assert b"</svg>" in fig_data
 
-    img_uri_b64 = ext.draw_svgbob(BASIC_BLOCK_TXT, default_options={'data_uri_encoding': "base64"})
-    img_uri     = ext.draw_svgbob(BASIC_BLOCK_TXT)
-    assert img_uri == img_uri_b64
-    assert img_uri.startswith("data:image/svg+xml;base64,")
-    expected = "<p><img src='{}' /></p>".format(img_uri)
+    inline_svg     = ext.draw_bob(BASIC_BLOCK_TXT, default_options={'tag_type': "inline_svg"})
+    default_output = ext.draw_bob(BASIC_BLOCK_TXT)
+    assert inline_svg == default_output
+    assert inline_svg
+    assert inline_svg.startswith("<svg")
+    expected = "<p>{}</p>".format(inline_svg)
 
-    assert "xmlns" not in img_uri
+    assert "xmlns" in inline_svg
 
     result = markdown(BASIC_BLOCK_TXT, extensions=['markdown_svgbob'])
 
-    assert img_uri in result
+    assert inline_svg in result
 
     assert result == expected
 
 
-def test_determinism_svg():
-    fig_data1 = markdown_svgbob.text2svg(BASIC_FIG_TXT)
-    fig_data2 = markdown_svgbob.text2svg(BASIC_FIG_TXT)
-    assert fig_data1 == fig_data2
+def test_encoding():
+    html_tag = ext.draw_bob(BASIC_BLOCK_TXT, default_options={'tag_type': "inline_svg"})
+    assert "xmlns" in html_tag
+    assert "<svg" in html_tag
+    assert "%3Csvg" not in html_tag
+    assert "svg+xml;base64" not in html_tag
+    assert "svg+xml;utf-8" not in html_tag
+    assert "<img" not in html_tag
 
+    html_tag = ext.draw_bob(BASIC_BLOCK_TXT, default_options={'tag_type': "img_base64_svg"})
+    assert "xmlns" not in html_tag
+    assert "<svg" not in html_tag
+    assert "%3Csvg" not in html_tag
+    assert "svg+xml;base64" in html_tag
+    assert "svg+xml;utf-8" not in html_tag
+    assert "<img src=" in html_tag
 
-def test_uri_encoding():
-    fig_data = markdown_svgbob.text2svg(BASIC_FIG_TXT)
-
-    img_uri = ext.draw_svgbob(BASIC_BLOCK_TXT, default_options={'data_uri_encoding': "utf-8"})
-    assert "xmlns" in img_uri
+    html_tag = ext.draw_bob(BASIC_BLOCK_TXT, default_options={'tag_type': "img_utf8_svg"})
+    assert "xmlns" in html_tag
+    assert "<svg" not in html_tag
+    assert "%3Csvg" in html_tag
+    assert "svg+xml;base64" not in html_tag
+    assert "svg+xml;utf-8" in html_tag
+    assert "<img src=" in html_tag
 
 
 def test_svgbob_options():
@@ -154,8 +180,8 @@ def test_svgbob_options():
 
     result = markdown(OPTIONS_BLOCK_TXT, extensions=['markdown_svgbob'])
 
-    img_uri  = ext.draw_svgbob(OPTIONS_BLOCK_TXT)
-    expected = "<p><img src='{}' /></p>".format(img_uri)
+    html_tag  = ext.draw_bob(OPTIONS_BLOCK_TXT)
+    expected = "<p>{}</p>".format(html_tag)
 
     assert result == expected
 
@@ -164,8 +190,8 @@ def test_extended_svgbob():
     extensions = DEFAULT_MKDOCS_EXTENSIONS + ['markdown_svgbob']
     result     = markdown(EXTENDED_BLOCK_TXT, extensions=extensions)
 
-    img_uri  = ext.draw_svgbob(BASIC_BLOCK_TXT)
-    expected = EXTENDED_HTML_TEMPLATE.format(img_uri)
+    html_tag = ext.draw_bob(BASIC_BLOCK_TXT)
+    expected = EXTENDED_HTML_TEMPLATE.format(html_tag)
     expected = expected.replace("\n", "")
     result   = result.replace("\n", "")
 
