@@ -106,6 +106,7 @@ HTMLTEST_TXT = HTMLTEST_TXT.replace("<figtxt>", BASIC_FIG_TXT)
 
 def test_regexp():
     assert ext.SvgbobPreprocessor.RE.match(BASIC_BLOCK_TXT)
+    assert ext.SvgbobPreprocessor.RE.match(BASIC_BLOCK_TXT.replace("```", "~~~"))
 
 
 def test_determinism_svg():
@@ -181,6 +182,23 @@ def test_svgbob_options():
     result = markdown(OPTIONS_BLOCK_TXT, extensions=['markdown_svgbob'])
 
     html_tag = ext.draw_bob(OPTIONS_BLOCK_TXT)
+    expected = "<p>{}</p>".format(html_tag)
+
+    assert result == expected
+
+
+def test_svgbob_config():
+    result = markdown(
+        BASIC_BLOCK_TXT,
+        extensions=['markdown_svgbob'],
+        extension_configs={'markdown_svgbob': {'stroke-width': 3}},
+    )
+
+    html_tag   = ext.draw_bob(BASIC_BLOCK_TXT)
+    unexpected = "<p>{}</p>".format(html_tag)
+    assert result != unexpected
+
+    html_tag = ext.draw_bob(BASIC_BLOCK_TXT, {'stroke-width': 3})
     expected = "<p>{}</p>".format(html_tag)
 
     assert result == expected

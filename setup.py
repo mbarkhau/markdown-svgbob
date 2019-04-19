@@ -68,6 +68,11 @@ setuptools.setup(
     install_requires=install_requires,
     python_requires=">=2.7",
     zip_safe=True,
+    entry_points={
+        'markdown.extensions': [
+            'markdown_svgbob = markdown_svgbob.extension:SvgbobExtension',
+        ]
+    },
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[

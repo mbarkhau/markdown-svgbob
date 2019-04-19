@@ -19,18 +19,20 @@ from markdown.postprocessors import Postprocessor
 
 import markdown_svgbob.wrapper as wrapper
 
+# inline_svg|img_utf8_svg|img_base64_svg
+TagType = str
+
 
 def svg2html(svg_data: bytes, tag_type: str = 'inline_svg') -> str:
     svg_data = svg_data.replace(b"\n", b"")
-    if tag_type in ('img_base64_svg', 'img_utf8_svg'):
-        if tag_type == 'img_base64_svg':
-            img_b64_data: bytes = base64.standard_b64encode(svg_data)
-            img_text = img_b64_data.decode('ascii')
-            return f'<img src="data:image/svg+xml;base64,{img_text}" />'
-        else:
-            img_text = svg_data.decode("utf-8")
-            img_text = quote(img_text.replace("\n", ""))
-            return f'<img src="data:image/svg+xml;utf-8,{img_text}" />'
+    if tag_type == 'img_base64_svg':
+        img_b64_data: bytes = base64.standard_b64encode(svg_data)
+        img_text = img_b64_data.decode('ascii')
+        return f'<img src="data:image/svg+xml;base64,{img_text}"/>'
+    elif tag_type == 'img_utf8_svg':
+        img_text = svg_data.decode("utf-8")
+        img_text = quote(img_text)
+        return f'<img src="data:image/svg+xml;utf-8,{img_text}"/>'
     elif tag_type == 'inline_svg':
         return svg_data.decode("utf-8")
     else:
@@ -38,12 +40,21 @@ def svg2html(svg_data: bytes, tag_type: str = 'inline_svg') -> str:
         raise NotImplementedError(err_msg)
 
 
-def draw_bob(block_text: str, default_options: wrapper.Options = None) -> str:
+def _clean_block_text(block_text: str) -> str:
     if block_text.startswith("```bob"):
         block_text = block_text[len("```bob") :]
+    elif block_text.startswith("~~~bob"):
+        block_text = block_text[len("~~~bob") :]
+
     if block_text.endswith("```"):
         block_text = block_text[: -len("```")]
+    elif block_text.endswith("~~~"):
+        block_text = block_text[: -len("~~~")]
+    return block_text
 
+
+def draw_bob(block_text: str, default_options: wrapper.Options = None) -> str:
+    block_text = _clean_block_text(block_text)
     header, rest = block_text.split("\n", 1)
 
     options: wrapper.Options = {}
@@ -63,7 +74,12 @@ def draw_bob(block_text: str, default_options: wrapper.Options = None) -> str:
 
 class SvgbobExtension(Extension):
     def __init__(self, **kwargs) -> None:
-        self.config = {'format': ['svg', "Format to use (svg/png)"]}
+        self.config = {
+            'tag_type': ['inline_svg', "Format to use (inline_svg|img_utf8_svg|img_base64_svg)"]
+        }
+        for name, options_text in wrapper.parse_options().items():
+            self.config[name] = ["", options_text]
+
         self.images: typ.Dict[str, str] = {}
         super(SvgbobExtension, self).__init__(**kwargs)
 
@@ -81,7 +97,7 @@ class SvgbobExtension(Extension):
 
 class SvgbobPreprocessor(Preprocessor):
 
-    RE = re.compile(r"^```bob")
+    RE = re.compile(r"^(```|~~~)bob")
 
     def __init__(self, md, ext: SvgbobExtension) -> None:
         super(SvgbobPreprocessor, self).__init__(md)
@@ -95,11 +111,15 @@ class SvgbobPreprocessor(Preprocessor):
         default_options: wrapper.Options = {
             'tag_type': self.ext.getConfig('tag_type', 'inline_svg')
         }
+        for name in self.ext.config.keys():
+            val = self.ext.getConfig(name, "")
+            if val != "":
+                default_options[name] = val
 
         for line in lines:
             if is_in_fence:
                 block_lines.append(line)
-                if "```" not in line:
+                if not ("```" in line or "~~~" in line):
                     continue
 
                 is_in_fence = False
