@@ -10,7 +10,7 @@ libarary which uses svgbob to generate images
 from ascii diagrams in fenced code blocks.
 """
 
-__version__ = "v201904.0002-beta"
+__version__ = "v201904.0003-beta"
 
 
 from markdown_svgbob.extension import SvgbobExtension
