@@ -47,6 +47,8 @@ MACHINE = platform.machine()
 
 
 def _get_pkg_bin_path(osname: str = OSNAME, machine: str = MACHINE) -> pl.Path:
+    if machine == 'AMD64':
+        machine = 'x86_64'
     glob_expr = f"*_{machine}-{osname}"
     bin_files = list(PKG_BIN_DIR.glob(glob_expr))
     if bin_files:

@@ -180,7 +180,7 @@ def test_svgbob_options():
 
     result = markdown(OPTIONS_BLOCK_TXT, extensions=['markdown_svgbob'])
 
-    html_tag  = ext.draw_bob(OPTIONS_BLOCK_TXT)
+    html_tag = ext.draw_bob(OPTIONS_BLOCK_TXT)
     expected = "<p>{}</p>".format(html_tag)
 
     assert result == expected
@@ -218,6 +218,7 @@ def test_options_parsing():
 def test_bin_paths():
     assert wrp._get_pkg_bin_path().exists()
     assert wrp._get_pkg_bin_path(machine="x86_64", osname="Windows").exists()
+    assert wrp._get_pkg_bin_path(machine="AMD64", osname="Windows").exists()
     assert wrp._get_pkg_bin_path(machine="x86_64", osname="Linux").exists()
     assert wrp._get_pkg_bin_path(machine="x86_64", osname="Darwin").exists()
 
