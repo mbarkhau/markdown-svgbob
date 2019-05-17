@@ -6,10 +6,11 @@
 # SPDX-License-Identifier: MIT
 import os
 import sys
+import json
 import typing as typ
 import subprocess as sp
 
-import markdown_svgbob as mdsvg
+import markdown_svgbob
 
 
 # To enable pretty tracebacks:
@@ -33,6 +34,7 @@ TEST_IMAGE = r"""
  (             )     (      )    (     )          \  \
   '-----+ ,---'       `>   '      `  <'            \  v
         |/
+
 """
 
 
@@ -40,7 +42,12 @@ ExitCode = int
 
 
 def _selftest() -> ExitCode:
-    svg_data = mdsvg.text2svg(TEST_IMAGE)
+    import markdown_svgbob.wrapper as wrp
+    print("Command options:")
+    print(json.dumps(wrp.parse_options(), indent=4))
+    print()
+
+    svg_data = wrp.text2svg(TEST_IMAGE)
     if not svg_data:
         return 1
 
@@ -60,9 +67,10 @@ def main(args: typ.List[str] = sys.argv[1:]) -> ExitCode:
         return _selftest()
 
     if "--version" in args or "-V" in args:
-        print(f"markdown-svgbob version: ", mdsvg.__version__)
+        version = markdown_svgbob.__version__
+        print("markdown-svgbob version: ", version)
 
-    binpath = mdsvg.get_svgbob_bin_path()
+    binpath = markdown_svgbob.get_bin_path()
     return sp.call([str(binpath)] + args)
 
 

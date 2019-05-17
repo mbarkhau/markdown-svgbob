@@ -19,7 +19,7 @@ from markdown.postprocessors import Postprocessor
 
 import markdown_svgbob.wrapper as wrapper
 
-# inline_svg|img_utf8_svg|img_base64_svg
+# TagType enumeration: inline_svg|img_utf8_svg|img_base64_svg
 TagType = str
 
 
@@ -54,14 +54,13 @@ def _clean_block_text(block_text: str) -> str:
 
 
 def draw_bob(block_text: str, default_options: wrapper.Options = None) -> str:
-    block_text = _clean_block_text(block_text)
-    header, rest = block_text.split("\n", 1)
-
     options: wrapper.Options = {}
 
     if default_options:
         options.update(default_options)
 
+    block_text = _clean_block_text(block_text)
+    header, rest = block_text.split("\n", 1)
     if "{" in header and "}" in header:
         options.update(json.loads(header))
         block_text = rest

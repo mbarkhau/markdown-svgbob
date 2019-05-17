@@ -3,18 +3,29 @@
 #
 # Copyright (c) 2019 Manuel Barkhau (mbarkhau@gmail.com) - MIT License
 # SPDX-License-Identifier: MIT
+
+# NOTE (mb 2019-05-16): This module is substantially shared with the
+#   markdown-katex package and meaningful changes should be
+#   replicated there also.
+
 import os
 import re
+import hashlib
+import tempfile
 import platform
 import typing as typ
 import pathlib2 as pl
 import subprocess as sp
 
 
+TMP_DIR = pl.Path(tempfile.gettempdir()) / "mdsvgbob"
+
 LIBDIR: pl.Path = pl.Path(__file__).parent
 PKG_BIN_DIR     = LIBDIR / "bin"
-DEFAULT_BIN_DIR = pl.Path("~") / ".cargo" / "bin"
-DEFAULT_BIN_DIR = DEFAULT_BIN_DIR.expanduser()
+FALLBACK_BIN_DIR = pl.Path("~") / ".cargo" / "bin"
+FALLBACK_BIN_DIR = FALLBACK_BIN_DIR.expanduser()
+
+CMD_NAME = "svgbob"
 
 
 def _get_usr_bin_path() -> typ.Optional[pl.Path]:
@@ -25,16 +36,16 @@ def _get_usr_bin_path() -> typ.Optional[pl.Path]:
         path_strs = env_path.split(os.pathsep)
         env_paths.extend([pl.Path(p) for p in path_strs])
 
-    # search in ~/.cargo/bin regardless of path
-    if DEFAULT_BIN_DIR not in env_paths:
-        env_paths.append(DEFAULT_BIN_DIR)
+    # search in fallback bin dir regardless of path
+    if FALLBACK_BIN_DIR not in env_paths:
+        env_paths.append(FALLBACK_BIN_DIR)
 
     for path in env_paths:
-        local_bin = path / "svgbob"
+        local_bin = path / CMD_NAME
         if local_bin.exists():
             return local_bin
 
-        local_bin = path / "svgbob.exe"
+        local_bin = path / f"{CMD_NAME}.exe"
         if local_bin.exists():
             return local_bin
 
@@ -64,7 +75,7 @@ def _get_pkg_bin_path(osname: str = OSNAME, machine: str = MACHINE) -> pl.Path:
     raise NotImplementedError(err_msg)
 
 
-def get_svgbob_bin_path() -> pl.Path:
+def get_bin_path() -> pl.Path:
     usr_bin_path = _get_usr_bin_path()
     if usr_bin_path:
         return usr_bin_path
@@ -72,9 +83,7 @@ def get_svgbob_bin_path() -> pl.Path:
         return _get_pkg_bin_path()
 
 
-def read_output(proc: sp.Popen) -> typ.Iterable[bytes]:
-    buf: typ.IO[bytes] = proc.stdout
-
+def read_output(buf: typ.IO[bytes]) -> typ.Iterable[bytes]:
     while True:
         output = buf.readline()
         if output:
@@ -88,7 +97,7 @@ Options  = typ.Dict[str, ArgValue]
 
 
 def text2svg(image_text: str, options: Options = None) -> bytes:
-    binpath   = get_svgbob_bin_path()
+    binpath   = get_bin_path()
     cmd_parts = [str(binpath)]
 
     if options:
@@ -107,13 +116,29 @@ def text2svg(image_text: str, options: Options = None) -> bytes:
                 cmd_parts.append(arg_name)
                 cmd_parts.append(arg_value)
 
-    proc = sp.Popen(cmd_parts, stdin=sp.PIPE, stdout=sp.PIPE)
+    input_data = image_text.encode("utf-8")
 
-    image_data = image_text.encode("utf-8")
-    proc.stdin.write(image_data)
-    proc.stdin.close()
+    hasher = hashlib.sha256(input_data)
+    for cmd_part in cmd_parts:
+        hasher.update(cmd_part.encode("utf-8"))
 
-    return b"".join(read_output(proc))
+    digest = hasher.hexdigest()
+
+    tmp_output_file = TMP_DIR / (digest + ".svg")
+    if not tmp_output_file.exists():
+        cmd_parts.extend([
+            "--output", str(tmp_output_file),
+        ])
+
+        TMP_DIR.mkdir(parents=True, exist_ok=True)
+        proc = sp.Popen(cmd_parts, stdin=sp.PIPE, stdout=sp.PIPE)
+
+        proc.stdin.write(input_data)
+        proc.stdin.close()
+        proc.wait()
+
+    with tmp_output_file.open(mode="rb") as fobj:
+        return fobj.read()
 
 
 # NOTE: in order to not have to update the code
@@ -121,7 +146,7 @@ def text2svg(image_text: str, options: Options = None) -> bytes:
 #   we parse the help text of the svgbob command.
 
 
-DEFAULT_HELP_TEXT = """
+DEFAULT_HELP_TEXT = r"""
 OPTIONS:
     NL
     --font-family <font-family>
@@ -147,21 +172,22 @@ DEFAULT_HELP_TEXT = DEFAULT_HELP_TEXT.replace("\n", " ").replace("NL", "\n")
 
 
 def _get_cmd_help_text() -> str:
-    binpath   = get_svgbob_bin_path()
+    binpath   = get_bin_path()
     cmd_parts = [str(binpath), "--help"]
     proc      = sp.Popen(cmd_parts, stdout=sp.PIPE)
-    help_data = b"".join(read_output(proc))
+    help_data = b"".join(read_output(proc.stdout))
     return help_data.decode("utf-8")
 
 
 OptionsHelp = typ.Dict[str, str]
 
-# https://regex101.com/r/287NYS/2
+# https://regex101.com/r/287NYS/4
 OPTION_PATTERN = r"""
-    --(?P<name>[a-z\-]+)
-    \s+<[a-z\-]+>
+    --
+    (?P<name>[a-z\-]+)
+    \s+(?:<[a-z\-]+>)?
     \s+
-    (?P<text>[\s\w(),:;.'"\[\]]*)
+    (?P<text>[^\n]*[ \s\w(){},:;.'\\/\[\] ]*)
 """
 OPTION_REGEX = re.compile(OPTION_PATTERN, flags=re.VERBOSE | re.DOTALL | re.MULTILINE)
 
@@ -176,8 +202,10 @@ def _parse_options_help_text(help_text: str) -> OptionsHelp:
         name = match.group("name")
         text = match.group("text")
         text = " ".join(l.strip() for l in text.splitlines())
-        options[name] = text
+        options[name] = text.strip()
 
+    options.pop("version", None)
+    options.pop("help", None)
     options.pop("output", None)
 
     return options

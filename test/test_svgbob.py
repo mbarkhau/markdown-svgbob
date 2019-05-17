@@ -54,7 +54,7 @@ OPTIONS_BLOCK_TXT = '```bob {"stroke-width": 4}\n' + BASIC_FIG_TXT + "```"
 DEFAULT_MKDOCS_EXTENSIONS = ['meta', 'toc', 'tables', 'fenced_code']
 
 
-EXTENDED_BLOCK_TXT = """
+EXTENDED_BLOCK_TXT = r"""
 # Heading
 
 prelude
@@ -72,7 +72,7 @@ EXTENDED_BLOCK_TXT = EXTENDED_BLOCK_TXT.format(BASIC_FIG_TXT)
 EXTENDED_HTML_TEMPLATE = r"""
 <h1 id="heading">Heading</h1>
 <p>prelude</p>
-<p>{}</p>
+<p>{0}</p>
 <p>postscript</p>
 """
 
@@ -106,7 +106,8 @@ HTMLTEST_TXT = HTMLTEST_TXT.replace("<figtxt>", BASIC_FIG_TXT)
 
 def test_regexp():
     assert ext.SvgbobPreprocessor.RE.match(BASIC_BLOCK_TXT)
-    assert ext.SvgbobPreprocessor.RE.match(BASIC_BLOCK_TXT.replace("```", "~~~"))
+    alt_block_text = BASIC_BLOCK_TXT.replace("```", "~~~")
+    assert ext.SvgbobPreprocessor.RE.match(alt_block_text)
 
 
 def test_determinism_svg():

@@ -45,6 +45,8 @@ $ curl https://sh.rustup.rs -sSf | sh   # see https://rustup.rs/
 $ cargo install svgbob_cli
 ```
 
+This extension will always use the installed version of svgbob if it is available.
+
 
 ## Usage
 
