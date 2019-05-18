@@ -43,6 +43,7 @@ ExitCode = int
 
 def _selftest() -> ExitCode:
     import markdown_svgbob.wrapper as wrp
+
     print("Command options:")
     print(json.dumps(wrp.parse_options(), indent=4))
     print()

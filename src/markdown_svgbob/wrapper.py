@@ -10,6 +10,7 @@
 
 import os
 import re
+import signal
 import hashlib
 import tempfile
 import platform
@@ -18,10 +19,19 @@ import pathlib2 as pl
 import subprocess as sp
 
 
+SIG_NAME_BY_NUM = {
+    k: v
+    for v, k in reversed(sorted(signal.__dict__.items()))
+    if v.startswith('SIG') and not v.startswith('SIG_')
+}
+
+assert SIG_NAME_BY_NUM[15] == 'SIGTERM'
+
+
 TMP_DIR = pl.Path(tempfile.gettempdir()) / "mdsvgbob"
 
 LIBDIR: pl.Path = pl.Path(__file__).parent
-PKG_BIN_DIR     = LIBDIR / "bin"
+PKG_BIN_DIR      = LIBDIR / "bin"
 FALLBACK_BIN_DIR = pl.Path("~") / ".cargo" / "bin"
 FALLBACK_BIN_DIR = FALLBACK_BIN_DIR.expanduser()
 
@@ -83,13 +93,17 @@ def get_bin_path() -> pl.Path:
         return _get_pkg_bin_path()
 
 
-def read_output(buf: typ.IO[bytes]) -> typ.Iterable[bytes]:
+def _iter_output_lines(buf: typ.IO[bytes]) -> typ.Iterable[bytes]:
     while True:
         output = buf.readline()
         if output:
             yield output
         else:
             return
+
+
+def read_output(buf: typ.IO[bytes]) -> str:
+    return b"".join(_iter_output_lines(buf)).decode("utf-8")
 
 
 ArgValue = typ.Union[str, int, float, bool]
@@ -125,17 +139,33 @@ def text2svg(image_text: str, options: Options = None) -> bytes:
     digest = hasher.hexdigest()
 
     tmp_output_file = TMP_DIR / (digest + ".svg")
-    if not tmp_output_file.exists():
-        cmd_parts.extend([
-            "--output", str(tmp_output_file),
-        ])
+
+    if tmp_output_file.exists():
+        tmp_output_file.touch()
+    else:
+        cmd_parts.extend(["--output", str(tmp_output_file)])
 
         TMP_DIR.mkdir(parents=True, exist_ok=True)
         proc = sp.Popen(cmd_parts, stdin=sp.PIPE, stdout=sp.PIPE)
 
         proc.stdin.write(input_data)
         proc.stdin.close()
-        proc.wait()
+        ret_code = proc.wait()
+
+        if ret_code < 0:
+            signame = SIG_NAME_BY_NUM[abs(ret_code)]
+            err_msg = (
+                f"Error processing svgbob image: "
+                + "svgbob_cli process ended with "
+                + f"code {ret_code} ({signame})"
+            )
+            raise Exception(err_msg)
+        elif ret_code > 0:
+            stdout  = read_output(proc.stdout)
+            errout  = read_output(proc.stderr)
+            output  = (stdout + "\n" + errout).strip()
+            err_msg = f"Error processing svgbob image: {output}"
+            raise Exception(err_msg)
 
     with tmp_output_file.open(mode="rb") as fobj:
         return fobj.read()
@@ -175,8 +205,8 @@ def _get_cmd_help_text() -> str:
     binpath   = get_bin_path()
     cmd_parts = [str(binpath), "--help"]
     proc      = sp.Popen(cmd_parts, stdout=sp.PIPE)
-    help_data = b"".join(read_output(proc.stdout))
-    return help_data.decode("utf-8")
+    help_text = read_output(proc.stdout)
+    return help_text
 
 
 OptionsHelp = typ.Dict[str, str]
@@ -205,8 +235,8 @@ def _parse_options_help_text(help_text: str) -> OptionsHelp:
         options[name] = text.strip()
 
     options.pop("version", None)
-    options.pop("help", None)
-    options.pop("output", None)
+    options.pop("help"   , None)
+    options.pop("output" , None)
 
     return options
 
