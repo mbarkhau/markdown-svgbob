@@ -10,6 +10,7 @@
 
 import os
 import re
+import time
 import signal
 import hashlib
 import tempfile
@@ -168,7 +169,21 @@ def text2svg(image_text: str, options: Options = None) -> bytes:
             raise Exception(err_msg)
 
     with tmp_output_file.open(mode="rb") as fobj:
-        return fobj.read()
+        result = fobj.read()
+
+    _cleanup_tmp_dir()
+
+    return result
+
+
+def _cleanup_tmp_dir() -> None:
+    min_mtime = time.time() - 24 * 60 * 60
+    for fpath in TMP_DIR.iterdir():
+        if not fpath.is_file():
+            continue
+        mtime = fpath.stat().st_mtime
+        if mtime < min_mtime:
+            fpath.unlink()
 
 
 # NOTE: in order to not have to update the code
