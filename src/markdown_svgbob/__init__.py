@@ -10,7 +10,7 @@ uses svgbob to generate images from ascii
 diagrams in fenced code blocks.
 """
 
-__version__ = "v201905.0005-beta"
+__version__ = "v201905.0006-beta"
 
 
 from markdown_svgbob.extension import SvgbobExtension
