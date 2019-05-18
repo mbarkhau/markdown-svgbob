@@ -1,6 +1,6 @@
 # Changelog for https://gitlab.com/mbarkhau/markdown-svgbob
 
-## v201905.0005-beta
+## v201905.0006-beta
 
  - Fix: better error reporting
  - Fix: cleanup temp dir
