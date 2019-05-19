@@ -10,6 +10,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import re
 from xml.sax.saxutils import unescape
 
 from markdown import markdown
@@ -156,7 +157,7 @@ def test_encoding():
     assert "%3Csvg" not in html_tag
     assert "svg+xml;base64" in html_tag
     assert "svg+xml;utf-8" not in html_tag
-    assert "<img src=" in html_tag
+    assert '<img class="bob" src=' in html_tag
 
     html_tag = ext.draw_bob(BASIC_BLOCK_TXT, default_options={'tag_type': "img_utf8_svg"})
     assert "xmlns" in html_tag
@@ -164,7 +165,7 @@ def test_encoding():
     assert "%3Csvg" in html_tag
     assert "svg+xml;base64" not in html_tag
     assert "svg+xml;utf-8" in html_tag
-    assert "<img src=" in html_tag
+    assert '<img class="bob" src=' in html_tag
 
 
 def test_svgbob_options():
@@ -232,6 +233,22 @@ def test_options_parsing():
     assert set(options.keys()) >= expected_option_keys
 
     assert "output" not in options
+
+
+def test_postproc():
+    html_tag = ext.draw_bob(BASIC_BLOCK_TXT, {'tag_type': "img_base64_svg"})
+    assert '<img class="bob"' in html_tag
+    html_tag = ext.draw_bob(BASIC_BLOCK_TXT)
+
+    assert '<svg class="bob"' in html_tag
+    assert re.search(r"\.bg_fill\s*\{\s*fill:\s*white;", html_tag)
+    assert re.search(r"\.fg_fill\s*\{\s*fill:\s*black;", html_tag)
+
+    html_tag = ext.draw_bob(BASIC_BLOCK_TXT, {'bg_color': "black", 'fg_color': "white"})
+
+    assert '<svg class="bob"' in html_tag
+    assert re.search(r"\.bg_fill\s*\{\s*fill:\s*black;", html_tag)
+    assert re.search(r"\.fg_fill\s*\{\s*fill:\s*white;", html_tag)
 
 
 def test_bin_paths():

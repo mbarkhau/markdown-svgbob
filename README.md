@@ -83,6 +83,8 @@ In your `mkdocs.yml` add this to markdown_extensions.
 markdown_extensions:
   - markdown_svgbob:
       tag_type: inline_svg
+      bg_color: white
+      fg_color: black
 ```
 
 Valid options for `tag_type` are `inline_svg` (the default), `img_utf8_svg` and `img_base64_svg`.

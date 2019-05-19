@@ -28,11 +28,11 @@ def svg2html(svg_data: bytes, tag_type: str = 'inline_svg') -> str:
     if tag_type == 'img_base64_svg':
         img_b64_data: bytes = base64.standard_b64encode(svg_data)
         img_text = img_b64_data.decode('ascii')
-        return f'<img src="data:image/svg+xml;base64,{img_text}"/>'
+        return f'<img class="bob" src="data:image/svg+xml;base64,{img_text}"/>'
     elif tag_type == 'img_utf8_svg':
         img_text = svg_data.decode("utf-8")
         img_text = quote(img_text)
-        return f'<img src="data:image/svg+xml;utf-8,{img_text}"/>'
+        return f'<img class="bob" src="data:image/svg+xml;utf-8,{img_text}"/>'
     elif tag_type == 'inline_svg':
         return svg_data.decode("utf-8")
     else:
@@ -53,6 +53,53 @@ def _clean_block_text(block_text: str) -> str:
     return block_text
 
 
+# https://regex101.com/r/BQkg5t/2/
+BG_STYLE_PATTERN = r"""
+(
+  rect\.backdrop\s*\{\s*fill:\s*white;
+| \.bg_fill\s*\{\s*fill:\s*white;
+)
+"""
+BG_STYLE_RE = re.compile(BG_STYLE_PATTERN.encode("ascii"), flags=re.VERBOSE)
+
+FG_STYLE_PATTERN = r"""
+(
+  \.fg_stroke\s*\{\s*stroke:\s*black;
+| \.fg_fill\s*\{\s*fill:\s*black;
+| text\s*{\s*fill:\s*black;
+)
+"""
+FG_STYLE_RE = re.compile(FG_STYLE_PATTERN.encode("ascii"), flags=re.VERBOSE)
+
+
+def _postprocess_svg(svg_data: bytes, bg_color: str = None, fg_color: str = None) -> bytes:
+    if bg_color:
+        pos = 0
+        while True:
+            match = BG_STYLE_RE.search(svg_data, pos)
+            if match is None:
+                break
+
+            repl = match.group(0).replace(b"white", bg_color.encode("ascii"))
+            begin, end = match.span()
+            pos      = end
+            svg_data = svg_data[:begin] + repl + svg_data[end:]
+
+    if fg_color:
+        pos = 0
+        while True:
+            match = FG_STYLE_RE.search(svg_data, pos)
+            if match is None:
+                break
+
+            repl = match.group(0).replace(b"black", fg_color.encode("ascii"))
+            begin, end = match.span()
+            pos      = end
+            svg_data = svg_data[:begin] + repl + svg_data[end:]
+
+    return svg_data
+
+
 def draw_bob(block_text: str, default_options: wrapper.Options = None) -> str:
     options: wrapper.Options = {}
 
@@ -67,14 +114,25 @@ def draw_bob(block_text: str, default_options: wrapper.Options = None) -> str:
 
     tag_type = typ.cast(str, options.pop('tag_type', 'inline_svg'))
 
+    bg_color = options.pop("bg_color", "")
+    fg_color = options.pop("fg_color", "")
+    if not isinstance(bg_color, str):
+        bg_color = ""
+    if not isinstance(fg_color, str):
+        fg_color = ""
+
     svg_data = wrapper.text2svg(block_text, options)
+    svg_data = _postprocess_svg(svg_data  , bg_color, fg_color)
+
     return svg2html(svg_data, tag_type=tag_type)
 
 
 class SvgbobExtension(Extension):
     def __init__(self, **kwargs) -> None:
         self.config = {
-            'tag_type': ['inline_svg', "Format to use (inline_svg|img_utf8_svg|img_base64_svg)"]
+            'tag_type': ["inline_svg", "Format to use (inline_svg|img_utf8_svg|img_base64_svg)"],
+            'bg_color': ["white"     , "Set the background color"],
+            'fg_color': ["black"     , "Set the foreground color"],
         }
         for name, options_text in wrapper.parse_options().items():
             self.config[name] = ["", options_text]
