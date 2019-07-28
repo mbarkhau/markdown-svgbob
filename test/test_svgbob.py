@@ -11,7 +11,6 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import re
-from xml.sax.saxutils import unescape
 
 from markdown import markdown
 
