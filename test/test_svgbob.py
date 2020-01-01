@@ -45,10 +45,10 @@ BASIC_FIG_TXT = r"""
 )
 
 
-BASIC_BLOCK_TXT = "```bob\n" + BASIC_FIG_TXT + "```"
+BASIC_BLOCK_TXT = "```bob\n" + BASIC_FIG_TXT + "\n```"
 
 
-OPTIONS_BLOCK_TXT = '```bob {"stroke-width": 4}\n' + BASIC_FIG_TXT + "```"
+OPTIONS_BLOCK_TXT = '```bob {"stroke-width": 4}\n' + BASIC_FIG_TXT + "\n```"
 
 
 DEFAULT_MKDOCS_EXTENSIONS = ['meta', 'toc', 'tables', 'fenced_code']

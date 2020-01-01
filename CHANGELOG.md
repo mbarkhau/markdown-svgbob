@@ -1,5 +1,10 @@
 # Changelog for https://gitlab.com/mbarkhau/markdown-svgbob
 
+## v202001.0009-beta
+
+ - Fix: Bad parsing of fences
+
+
 ## v201907.0008-beta
 
  - Fix: use PEP 508 environment marker to not always install the `typing` package. Fixes gitlab#1

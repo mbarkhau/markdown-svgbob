@@ -162,6 +162,7 @@ class SvgbobPreprocessor(Preprocessor):
 
     def run(self, lines: typ.List[str]) -> typ.List[str]:
         is_in_fence = False
+        expected_close_fence = "```"
         out_lines  : typ.List[str] = []
         block_lines: typ.List[str] = []
 
@@ -176,7 +177,8 @@ class SvgbobPreprocessor(Preprocessor):
         for line in lines:
             if is_in_fence:
                 block_lines.append(line)
-                if not ("```" in line or "~~~" in line):
+                is_ending_fence = line.strip() == expected_close_fence
+                if not is_ending_fence:
                     continue
 
                 is_in_fence = False
@@ -190,6 +192,7 @@ class SvgbobPreprocessor(Preprocessor):
                 self.ext.images[marker] = tag_text
             elif self.RE.match(line):
                 is_in_fence = True
+                expected_close_fence = self.RE.match(line).group(1)
                 block_lines.append(line)
             else:
                 out_lines.append(line)
