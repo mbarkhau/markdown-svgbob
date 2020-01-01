@@ -161,11 +161,6 @@ class SvgbobPreprocessor(Preprocessor):
         self.ext: SvgbobExtension = ext
 
     def run(self, lines: typ.List[str]) -> typ.List[str]:
-        is_in_fence = False
-        expected_close_fence = "```"
-        out_lines  : typ.List[str] = []
-        block_lines: typ.List[str] = []
-
         default_options: wrapper.Options = {
             'tag_type': self.ext.getConfig('tag_type', 'inline_svg')
         }
@@ -173,6 +168,12 @@ class SvgbobPreprocessor(Preprocessor):
             val = self.ext.getConfig(name, "")
             if val != "":
                 default_options[name] = val
+
+        is_in_fence          = False
+        expected_close_fence = "```"
+
+        out_lines  : typ.List[str] = []
+        block_lines: typ.List[str] = []
 
         for line in lines:
             if is_in_fence:
@@ -191,7 +192,7 @@ class SvgbobPreprocessor(Preprocessor):
                 out_lines.append(marker)
                 self.ext.images[marker] = tag_text
             elif self.RE.match(line):
-                is_in_fence = True
+                is_in_fence          = True
                 expected_close_fence = self.RE.match(line).group(1)
                 block_lines.append(line)
             else:
