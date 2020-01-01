@@ -191,12 +191,14 @@ class SvgbobPreprocessor(Preprocessor):
                 tag_text = f"<p>{img_tag}</p>"
                 out_lines.append(marker)
                 self.ext.images[marker] = tag_text
-            elif self.RE.match(line):
-                is_in_fence          = True
-                expected_close_fence = self.RE.match(line).group(1)
-                block_lines.append(line)
             else:
-                out_lines.append(line)
+                fence_match = self.RE.match(line)
+                if fence_match:
+                    is_in_fence          = True
+                    expected_close_fence = fence_match.group(1)
+                    block_lines.append(line)
+                else:
+                    out_lines.append(line)
 
         return out_lines
 
