@@ -6,6 +6,7 @@
 import re
 import json
 import base64
+import hashlib
 import typing as typ
 
 try:
@@ -15,8 +16,14 @@ except ImportError:
 
 from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
+from markdown.postprocessors import Postprocessor
 
 import markdown_svgbob.wrapper as wrapper
+
+
+def make_marker_id(text: str) -> str:
+    data = text.encode("utf-8")
+    return hashlib.md5(data).hexdigest()
 
 
 # TagType enumeration: inline_svg|img_utf8_svg|img_base64_svg
@@ -137,14 +144,18 @@ class SvgbobExtension(Extension):
         for name, options_text in wrapper.parse_options().items():
             self.config[name] = ["", options_text]
 
+        self.images: typ.Dict[str, str] = {}
         super(SvgbobExtension, self).__init__(**kwargs)
+
+    def reset(self) -> None:
+        self.images.clear()
 
     def extendMarkdown(self, md, *args, **kwargs) -> None:
         preproc = SvgbobPreprocessor(md, self)
         md.preprocessors.register(preproc, name='svgbob_fenced_code_block', priority=50)
 
-        # postproc = SvgbobPostprocessor(md, self)
-        # md.postprocessors.register(postproc, name='svgbob_fenced_code_block', priority=0)
+        postproc = SvgbobPostprocessor(md, self)
+        md.postprocessors.register(postproc, name='svgbob_fenced_code_block', priority=0)
         md.registerExtension(self)
 
 
@@ -181,8 +192,12 @@ class SvgbobPreprocessor(Preprocessor):
                 is_in_fence = False
                 block_text  = "\n".join(block_lines)
                 del block_lines[:]
-                img_tag = draw_bob(block_text, default_options)
-                out_lines.append(f"<p>{img_tag}</p>")
+                img_tag  = draw_bob(block_text, default_options)
+                img_id   = make_marker_id(img_tag)
+                marker   = f"<p id='svgbob{img_id}'>svgbob{img_id}</p>"
+                tag_text = f"<p>{img_tag}</p>"
+                out_lines.append(marker)
+                self.ext.images[marker] = tag_text
             else:
                 fence_match = self.RE.match(line)
                 if fence_match:
@@ -193,3 +208,29 @@ class SvgbobPreprocessor(Preprocessor):
                     out_lines.append(line)
 
         return out_lines
+
+
+# NOTE (mb):
+#   Q: Why this business with the Postprocessor? Why
+#   not just do `out_lines.append(tag_text)` and save
+#   the hassle of `self.ext.images[marker] = tag_text` ?
+#   A: Maybe there are other processors that can't be
+#   trusted to leave the inserted markup alone. Maybe
+#   the inserted markup could be incorrectly parsed as
+#   valid markdown.
+
+
+class SvgbobPostprocessor(Postprocessor):
+    def __init__(self, md, ext: SvgbobExtension) -> None:
+        super(SvgbobPostprocessor, self).__init__(md)
+        self.ext: SvgbobExtension = ext
+
+    def run(self, text: str) -> str:
+        for marker, img in self.ext.images.items():
+            wrapped_marker = "<p>" + marker + "</p>"
+            if wrapped_marker in text:
+                text = text.replace(wrapped_marker, img)
+            elif marker in text:
+                text = text.replace(marker, img)
+
+        return text

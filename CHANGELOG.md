@@ -1,6 +1,6 @@
 # Changelog for https://gitlab.com/mbarkhau/markdown-svgbob
 
-## v202001.0010-beta
+## v202001.0011-beta
 
  - Fix: Bad image substitution when markdown has multiple diagrams
 
