@@ -262,6 +262,10 @@ def test_html_output():
     # NOTE: This generates html that is to be tested
     #   in the browser (for warnings in devtools).
     extensions = DEFAULT_MKDOCS_EXTENSIONS + ['markdown_svgbob']
-    result     = markdown(HTMLTEST_TXT, extensions=extensions)
+    result     = markdown(
+        HTMLTEST_TXT,
+        extensions=extensions,
+        extension_configs={'markdown_svgbob': {'min_char_width': "60"}},
+    )
     with open("/tmp/svgbob.html", mode="w") as fh:
         fh.write(result)

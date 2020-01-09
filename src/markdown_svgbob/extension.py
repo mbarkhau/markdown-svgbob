@@ -7,6 +7,7 @@ import re
 import json
 import base64
 import hashlib
+import logging
 import typing as typ
 
 try:
@@ -19,6 +20,8 @@ from markdown.preprocessors import Preprocessor
 from markdown.postprocessors import Postprocessor
 
 import markdown_svgbob.wrapper as wrapper
+
+log = logging.getLogger(__name__)
 
 
 def make_marker_id(text: str) -> str:
@@ -58,6 +61,26 @@ def _clean_block_text(block_text: str) -> str:
     elif block_text.endswith("~~~"):
         block_text = block_text[: -len("~~~")]
     return block_text
+
+
+def _parse_min_char_width(options: wrapper.Options) -> int:
+    min_char_width = options.pop("min_char_width", "")
+    try:
+        return round(float(min_char_width))
+    except ValueError:
+        log.warning(f"Invalid argument for min_char_width. expected integer, got: {min_char_width}")
+        return 0
+
+
+def _add_char_padding(block_text: str, min_width: int) -> str:
+    lines       = block_text.splitlines()
+    block_width = max(len(l) for l in lines)
+    if block_width >= min_width:
+        return block_text
+
+    lpad      = " " * ((min_width - block_width) // 2)
+    new_lines = [(lpad + line).ljust(min_width) for line in lines]
+    return "\n".join(new_lines)
 
 
 # https://regex101.com/r/BQkg5t/2/
@@ -119,6 +142,10 @@ def draw_bob(block_text: str, default_options: wrapper.Options = None) -> str:
         options.update(json.loads(header))
         block_text = rest
 
+    min_char_width = _parse_min_char_width(options)
+    if min_char_width:
+        block_text = _add_char_padding(block_text, min_char_width)
+
     tag_type = typ.cast(str, options.pop('tag_type', 'inline_svg'))
 
     bg_color = options.pop("bg_color", "")
@@ -137,9 +164,10 @@ def draw_bob(block_text: str, default_options: wrapper.Options = None) -> str:
 class SvgbobExtension(Extension):
     def __init__(self, **kwargs) -> None:
         self.config = {
-            'tag_type': ["inline_svg", "Format to use (inline_svg|img_utf8_svg|img_base64_svg)"],
-            'bg_color': ["white"     , "Set the background color"],
-            'fg_color': ["black"     , "Set the foreground color"],
+            'tag_type'      : ["inline_svg", "Format to use (inline_svg|img_utf8_svg|img_base64_svg)"],
+            'bg_color'      : ["white"     , "Set the background color"],
+            'fg_color'      : ["black"     , "Set the foreground color"],
+            'min_char_width': [""          , "Minimum width of diagram in characters"],
         }
         for name, options_text in wrapper.parse_options().items():
             self.config[name] = ["", options_text]
@@ -169,7 +197,8 @@ class SvgbobPreprocessor(Preprocessor):
 
     def run(self, lines: typ.List[str]) -> typ.List[str]:
         default_options: wrapper.Options = {
-            'tag_type': self.ext.getConfig('tag_type', 'inline_svg')
+            'tag_type'      : self.ext.getConfig('tag_type'      , 'inline_svg'),
+            'min_char_width': self.ext.getConfig('min_char_width', ""),
         }
         for name in self.ext.config.keys():
             val = self.ext.getConfig(name, "")

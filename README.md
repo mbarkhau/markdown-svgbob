@@ -85,9 +85,12 @@ markdown_extensions:
       tag_type: inline_svg
       bg_color: white
       fg_color: black
+      min_char_width: 80
 ```
 
 Valid options for `tag_type` are `inline_svg` (the default), `img_utf8_svg` and `img_base64_svg`.
+
+The option `min_char_width` allows you to create diagrams of a uniform scale.
 
 
 [repo_ref]: https://gitlab.com/mbarkhau/markdown-svgbob
