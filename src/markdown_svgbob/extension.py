@@ -66,7 +66,7 @@ def _clean_block_text(block_text: str) -> str:
 def _parse_min_char_width(options: wrapper.Options) -> int:
     min_char_width = options.pop("min_char_width", "")
     try:
-        return round(float(min_char_width))
+        return int(round(float(min_char_width)))
     except ValueError:
         log.warning(f"Invalid argument for min_char_width. expected integer, got: {min_char_width}")
         return 0
