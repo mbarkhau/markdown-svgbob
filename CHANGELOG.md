@@ -1,5 +1,10 @@
 # Changelog for https://gitlab.com/mbarkhau/markdown-svgbob
 
+## v202001.0010-beta
+
+ - Fix: Bad image substitution when markdown has multiple diagrams
+
+
 ## v202001.0009-beta
 
  - Fix: Bad parsing of fences
@@ -13,7 +18,7 @@
 ## v201905.0007-beta
 
  - Add: bg_color and fg_color options
- 
+
 
 ## v201905.0006-beta
 
