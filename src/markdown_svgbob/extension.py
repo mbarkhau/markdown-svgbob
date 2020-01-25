@@ -191,7 +191,6 @@ BLOCK_RE = re.compile(r"^(```|~~~)bob")
 
 
 class SvgbobPreprocessor(Preprocessor):
-
     def __init__(self, md, ext: SvgbobExtension) -> None:
         super(SvgbobPreprocessor, self).__init__(md)
         self.ext: SvgbobExtension = ext
