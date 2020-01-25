@@ -105,9 +105,9 @@ HTMLTEST_TXT = HTMLTEST_TXT.replace("<figtxt>", BASIC_FIG_TXT)
 
 
 def test_regexp():
-    assert ext.SvgbobPreprocessor.RE.match(BASIC_BLOCK_TXT)
+    assert ext.BLOCK_RE.match(BASIC_BLOCK_TXT)
     alt_block_text = BASIC_BLOCK_TXT.replace("```", "~~~")
-    assert ext.SvgbobPreprocessor.RE.match(alt_block_text)
+    assert ext.BLOCK_RE.match(alt_block_text)
 
 
 def test_determinism_svg():
