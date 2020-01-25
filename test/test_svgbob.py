@@ -140,6 +140,13 @@ def test_basic_svg():
 
     assert result == expected
 
+def test_consistency():
+    default_output = ext.draw_bob(BASIC_BLOCK_TXT)
+    trailing_newline_output = ext.draw_bob(BASIC_BLOCK_TXT + "\n")
+    trailing_space_output = ext.draw_bob(BASIC_BLOCK_TXT + " ")
+
+    assert trailing_newline_output == default_output
+    assert trailing_space_output == default_output
 
 def test_encoding():
     html_tag = ext.draw_bob(BASIC_BLOCK_TXT, default_options={'tag_type': "inline_svg"})
