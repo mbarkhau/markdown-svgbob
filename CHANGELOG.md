@@ -1,5 +1,10 @@
 # Changelog for https://gitlab.com/mbarkhau/markdown-svgbob
 
+## v202001.0013-beta
+
+ - Fix #2: Ignore trailing whitespace after closing fence.
+
+
 ## v202001.0012-beta
 
  - Add: `min_char_width` option. Allows diagrams in a document to have a uniform scale.

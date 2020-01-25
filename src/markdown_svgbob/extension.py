@@ -187,9 +187,10 @@ class SvgbobExtension(Extension):
         md.registerExtension(self)
 
 
-class SvgbobPreprocessor(Preprocessor):
+BLOCK_RE = re.compile(r"^(```|~~~)bob")
 
-    RE = re.compile(r"^(```|~~~)bob")
+
+class SvgbobPreprocessor(Preprocessor):
 
     def __init__(self, md, ext: SvgbobExtension) -> None:
         super(SvgbobPreprocessor, self).__init__(md)
@@ -219,16 +220,18 @@ class SvgbobPreprocessor(Preprocessor):
                     continue
 
                 is_in_fence = False
-                block_text  = "\n".join(block_lines)
+                block_text  = "\n".join(block_lines).rstrip()
                 del block_lines[:]
+
                 img_tag  = draw_bob(block_text, default_options)
                 img_id   = make_marker_id(img_tag)
                 marker   = f"<p id='svgbob{img_id}'>svgbob{img_id}</p>"
                 tag_text = f"<p>{img_tag}</p>"
+
                 out_lines.append(marker)
                 self.ext.images[marker] = tag_text
             else:
-                fence_match = self.RE.match(line)
+                fence_match = BLOCK_RE.match(line)
                 if fence_match:
                     is_in_fence          = True
                     expected_close_fence = fence_match.group(1)

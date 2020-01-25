@@ -141,6 +141,14 @@ def test_basic_svg():
     assert result == expected
 
 
+def test_trailing_whitespace():
+    default_output = ext.draw_bob(BASIC_BLOCK_TXT)
+
+    trailing_space_result = markdown(BASIC_BLOCK_TXT + "  ", extensions=['markdown_svgbob'])
+    assert default_output in trailing_space_result
+    assert "```" not in trailing_space_result
+
+
 def test_encoding():
     html_tag = ext.draw_bob(BASIC_BLOCK_TXT, default_options={'tag_type': "inline_svg"})
     assert "xmlns" in html_tag
