@@ -34,7 +34,7 @@ MODULE_NAME="markdown_svgbob"
 GIT_REPO_NAMESPACE="mbarkhau"
 GIT_REPO_DOMAIN="gitlab.com"
 
-PACKAGE_VERSION="v202001.0012-beta"
+PACKAGE_VERSION="v202001.0013-beta"
 
 # These must be valid (space separated) conda package names.
 # A separate conda environment will be created for each of these.
