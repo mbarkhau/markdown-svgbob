@@ -51,6 +51,7 @@ def svg2html(svg_data: bytes, tag_type: TagType = 'inline_svg') -> str:
 
 
 def _clean_block_text(block_text: str) -> str:
+    block_text = block_text.strip()
     if block_text.startswith("```bob"):
         block_text = block_text[len("```bob") :]
     elif block_text.startswith("~~~bob"):
