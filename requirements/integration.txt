@@ -11,6 +11,7 @@
 # Support for Python 2.x and PyPy has been dropped (#340).
 pydocstyle<4
 
+
 flake8
 flake8-bugbear
 flake8-docstrings
@@ -19,6 +20,7 @@ flake8-comprehensions
 flake8-junit-report
 pylint
 mypy
+isort
 
 # http://doc.pytest.org/en/latest/py27-py34-deprecation.html
 # The pytest 4.6 series will be the last to support Python 2.7
