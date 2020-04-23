@@ -5,9 +5,9 @@
 # Copyright (c) 2019 Manuel Barkhau (mbarkhau@gmail.com) - MIT License
 # SPDX-License-Identifier: MIT
 
-from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
+from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import re
@@ -17,7 +17,6 @@ from markdown import markdown
 import markdown_svgbob
 import markdown_svgbob.wrapper as wrp
 import markdown_svgbob.extension as ext
-
 
 BASIC_FIG_TXT = r"""
        .---.                      .

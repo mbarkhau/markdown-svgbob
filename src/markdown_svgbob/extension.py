@@ -6,20 +6,21 @@
 import re
 import json
 import base64
+import typing as typ
 import hashlib
 import logging
-import typing as typ
-
-try:
-    from urllib.parse import quote
-except ImportError:
-    from urllib import quote  # type: ignore
 
 from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
 from markdown.postprocessors import Postprocessor
 
 import markdown_svgbob.wrapper as wrapper
+
+try:
+    from urllib.parse import quote
+except ImportError:
+    from urllib import quote  # type: ignore
+
 
 log = logging.getLogger(__name__)
 

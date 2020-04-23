@@ -13,8 +13,9 @@ diagrams in fenced code blocks.
 __version__ = "v202001.0013-beta"
 
 
+from markdown_svgbob.wrapper import text2svg
+from markdown_svgbob.wrapper import get_bin_path
 from markdown_svgbob.extension import SvgbobExtension
-from markdown_svgbob.wrapper import text2svg, get_bin_path
 
 get_svgbob_bin_path = get_bin_path
 
