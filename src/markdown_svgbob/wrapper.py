@@ -103,7 +103,8 @@ def _iter_output_lines(buf: typ.IO[bytes]) -> typ.Iterable[bytes]:
             return
 
 
-def read_output(buf: typ.IO[bytes]) -> str:
+def read_output(buf: typ.Optional[typ.IO[bytes]]) -> str:
+    assert buf is not None
     return b"".join(_iter_output_lines(buf)).decode("utf-8")
 
 
@@ -148,9 +149,11 @@ def text2svg(image_text: str, options: Options = None) -> bytes:
 
         TMP_DIR.mkdir(parents=True, exist_ok=True)
         proc = sp.Popen(cmd_parts, stdin=sp.PIPE, stdout=sp.PIPE)
+        stdin = proc.stdin
+        assert stdin is not None
 
-        proc.stdin.write(input_data)
-        proc.stdin.close()
+        stdin.write(input_data)
+        stdin.close()
         ret_code = proc.wait()
 
         if ret_code < 0:
