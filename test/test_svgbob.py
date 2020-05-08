@@ -11,8 +11,9 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import re
+import textwrap
 
-from markdown import markdown
+import markdown as md
 
 import markdown_svgbob
 import markdown_svgbob.wrapper as wrp
@@ -133,7 +134,7 @@ def test_basic_svg():
 
     assert "xmlns" in inline_svg
 
-    result = markdown(BASIC_BLOCK_TXT, extensions=['markdown_svgbob'])
+    result = md.markdown(BASIC_BLOCK_TXT, extensions=['markdown_svgbob'])
 
     assert inline_svg in result
 
@@ -143,7 +144,7 @@ def test_basic_svg():
 def test_trailing_whitespace():
     default_output = ext.draw_bob(BASIC_BLOCK_TXT)
 
-    trailing_space_result = markdown(BASIC_BLOCK_TXT + "  ", extensions=['markdown_svgbob'])
+    trailing_space_result = md.markdown(BASIC_BLOCK_TXT + "  ", extensions=['markdown_svgbob'])
     assert default_output in trailing_space_result
     assert "```" not in trailing_space_result
 
@@ -187,7 +188,7 @@ def test_svgbob_options():
     assert b"<svg" in fig_data
     assert b"</svg>" in fig_data
 
-    result = markdown(OPTIONS_BLOCK_TXT, extensions=['markdown_svgbob'])
+    result = md.markdown(OPTIONS_BLOCK_TXT, extensions=['markdown_svgbob'])
 
     html_tag = ext.draw_bob(OPTIONS_BLOCK_TXT)
     expected = "<p>{}</p>".format(html_tag)
@@ -196,7 +197,7 @@ def test_svgbob_options():
 
 
 def test_svgbob_config():
-    result = markdown(
+    result = md.markdown(
         BASIC_BLOCK_TXT,
         extensions=['markdown_svgbob'],
         extension_configs={'markdown_svgbob': {'stroke-width': 3}},
@@ -214,7 +215,7 @@ def test_svgbob_config():
 
 def test_extended_svgbob():
     extensions = DEFAULT_MKDOCS_EXTENSIONS + ['markdown_svgbob']
-    result     = markdown(EXTENDED_BLOCK_TXT, extensions=extensions)
+    result     = md.markdown(EXTENDED_BLOCK_TXT, extensions=extensions)
 
     html_tag = ext.draw_bob(BASIC_BLOCK_TXT)
     expected = EXTENDED_HTML_TEMPLATE.format(html_tag)
@@ -269,10 +270,53 @@ def test_html_output():
     # NOTE: This generates html that is to be tested
     #   in the browser (for warnings in devtools).
     extensions = DEFAULT_MKDOCS_EXTENSIONS + ['markdown_svgbob']
-    result     = markdown(
+    result     = md.markdown(
         HTMLTEST_TXT,
         extensions=extensions,
         extension_configs={'markdown_svgbob': {'min_char_width': "60"}},
     )
     with open("/tmp/svgbob.html", mode="w") as fh:
         fh.write(result)
+
+
+def test_ignore_non_bob_blocks():
+    md_text = textwrap.dedent(
+        r"""
+        Look at this literal asciiart:
+
+        ```
+        Literal asciiart
+               .---.
+              /-o-/--
+           .-/ / /->
+          ( *  \/
+           '-.  \
+              \ /
+               '
+        ```
+
+        And also this code:
+
+        ```python
+        def randint() -> int:
+            return 4
+        ```
+
+        And this code:
+
+        ~~~javascript
+        function randint() {
+            return 4;
+        }
+        ~~~
+        """
+    )
+    result_a = md.markdown(md_text, extensions=DEFAULT_MKDOCS_EXTENSIONS + ['markdown_svgbob'],)
+    result_b = md.markdown(md_text, extensions=DEFAULT_MKDOCS_EXTENSIONS,)
+    assert "bob" not in result_a
+    assert "bob" not in result_b
+
+    assert result_a == result_b
+    assert "<pre><code>Literal asciiart" in result_a
+    assert '<pre><code class="python">def randint' in result_a
+    assert '<pre><code class="javascript">function randint' in result_a
