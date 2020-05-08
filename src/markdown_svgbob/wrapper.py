@@ -148,7 +148,7 @@ def text2svg(image_text: str, options: Options = None) -> bytes:
         cmd_parts.extend(["--output", str(tmp_output_file)])
 
         TMP_DIR.mkdir(parents=True, exist_ok=True)
-        proc = sp.Popen(cmd_parts, stdin=sp.PIPE, stdout=sp.PIPE)
+        proc  = sp.Popen(cmd_parts, stdin=sp.PIPE, stdout=sp.PIPE)
         stdin = proc.stdin
         assert stdin is not None
 
