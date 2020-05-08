@@ -63,7 +63,13 @@ if [[ -f "makefile.extra.make" && -f "makefile.config.make" ]]; then
     printf "## -- Extra/Custom/Project Specific Tasks --\n" >> makefile;
     cat makefile.extra.make >> makefile;
 
+    git rm makefile.config.make;
+    git rm makefile.extra.make;
+    git add makefile;
+    git add makefile.bootstrapit.make;
+
     printf "\nNow the 'makefile' is yours and the bootstrapit targets are in makefile.bootstrapit.make"
+    exit 1
 fi
 
 # Argument parsing from
