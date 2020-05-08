@@ -10,7 +10,6 @@ SHELL := /bin/bash
 .DEFAULT_GOAL := help
 .SUFFIXES:
 
-
 PROJECT_DIR := $(notdir $(abspath .))
 
 ifndef DEVELOPMENT_PYTHON_VERSION
@@ -182,7 +181,7 @@ help:
 				helpMessage = ""; \
 			} \
 		}' \
-		$(MAKEFILE_LIST)
+		makefile.bootstrapit.make makefile
 
 	@if [[ ! -f $(DEV_ENV_PY) ]]; then \
 	echo "Missing python interpreter at $(DEV_ENV_PY) !"; \
@@ -236,7 +235,7 @@ helpverbose:
 				helpMessage = ""; \
 			} \
 		}' \
-		$(MAKEFILE_LIST)
+		makefile.bootstrapit.make makefile
 
 
 ## -- Project Setup --
@@ -583,6 +582,3 @@ docker_build:
 	fi
 
 	docker push $(DOCKER_BASE_IMAGE)
-
-
-
