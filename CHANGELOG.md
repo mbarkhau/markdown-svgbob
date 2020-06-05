@@ -1,5 +1,10 @@
 # Changelog for https://gitlab.com/mbarkhau/markdown-svgbob
 
+## v202006.0015
+
+ - Fix: `bg_color` not updated in some cases
+
+
 ## v202001.0013-beta
 
  - Fix #2: Ignore trailing whitespace after closing fence.
@@ -27,7 +32,7 @@
 
 ## v201905.0007-beta
 
- - Add: bg_color and fg_color options
+ - Add: `bg_color` and `fg_color` options
 
 
 ## v201905.0006-beta
