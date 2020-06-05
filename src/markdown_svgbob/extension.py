@@ -10,11 +10,10 @@ import typing as typ
 import hashlib
 import logging
 
+import markdown_svgbob.wrapper as wrapper
 from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
 from markdown.postprocessors import Postprocessor
-
-import markdown_svgbob.wrapper as wrapper
 
 try:
     from urllib.parse import quote
@@ -75,7 +74,7 @@ def _parse_min_char_width(options: wrapper.Options) -> int:
 
 def _add_char_padding(block_text: str, min_width: int) -> str:
     lines       = block_text.splitlines()
-    block_width = max(len(l) for l in lines)
+    block_width = max(len(line) for line in lines)
     if block_width >= min_width:
         return block_text
 
