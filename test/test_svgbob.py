@@ -249,13 +249,29 @@ def test_postproc():
 
     assert '<svg class="bob"' in html_tag
     assert re.search(r"\.bg_fill\s*\{\s*fill:\s*white;", html_tag)
+    backdrop_rect = (
+        re.search(r'</style>\s*<rect\s+fill="white"', html_tag)
+        or (
+            re.search(r'</style>\s*<rect\s+class="backdrop"', html_tag)
+            and re.search(r'rect\.backdrop\s*\{\s*fill:\s*white', html_tag)
+        )
+    )
+    assert backdrop_rect
     assert re.search(r"\.fg_fill\s*\{\s*fill:\s*black;", html_tag)
 
-    html_tag = ext.draw_bob(BASIC_BLOCK_TXT, {'bg_color': "black", 'fg_color': "white"})
+    html_tag = ext.draw_bob(BASIC_BLOCK_TXT, {'bg_color': "red", 'fg_color': "green"})
 
     assert '<svg class="bob"' in html_tag
-    assert re.search(r"\.bg_fill\s*\{\s*fill:\s*black;", html_tag)
-    assert re.search(r"\.fg_fill\s*\{\s*fill:\s*white;", html_tag)
+    assert re.search(r"\.bg_fill\s*\{\s*fill:\s*red;", html_tag)
+    backdrop_rect = (
+        re.search(r'</style>\s*<rect\s+fill="red"', html_tag)
+        or (
+            re.search(r'</style>\s*<rect\s+class="backdrop"', html_tag)
+            and re.search(r'rect\.backdrop\s*\{\s*fill:\s*red', html_tag)
+        )
+    )
+    assert backdrop_rect
+    assert re.search(r"\.fg_fill\s*\{\s*fill:\s*green;", html_tag)
 
 
 def test_bin_paths():

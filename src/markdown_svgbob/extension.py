@@ -89,6 +89,7 @@ BG_STYLE_PATTERN = r"""
 (
   rect\.backdrop\s*\{\s*fill:\s*white;
 | \.bg_fill\s*\{\s*fill:\s*white;
+| </style><rect fill="white"
 )
 """
 BG_STYLE_RE = re.compile(BG_STYLE_PATTERN.encode("ascii"), flags=re.VERBOSE)
