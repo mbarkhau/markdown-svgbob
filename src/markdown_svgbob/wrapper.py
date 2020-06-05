@@ -159,7 +159,7 @@ def text2svg(image_text: str, options: Options = None) -> bytes:
         if ret_code < 0:
             signame = SIG_NAME_BY_NUM[abs(ret_code)]
             err_msg = (
-                f"Error processing svgbob image: "
+                "Error processing svgbob image: "
                 + "svgbob_cli process ended with "
                 + f"code {ret_code} ({signame})"
             )
@@ -249,7 +249,7 @@ def _parse_options_help_text(help_text: str) -> OptionsHelp:
     for match in OPTION_REGEX.finditer(options_text):
         name = match.group("name")
         text = match.group("text")
-        text = " ".join(l.strip() for l in text.splitlines())
+        text = " ".join(line.strip() for line in text.splitlines())
         options[name] = text.strip()
 
     options.pop("version", None)
