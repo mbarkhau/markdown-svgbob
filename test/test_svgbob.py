@@ -249,6 +249,8 @@ def test_postproc():
 
     assert '<svg class="bob"' in html_tag
     assert re.search(r"\.bg_fill\s*\{\s*fill:\s*white;", html_tag)
+    # TODO (mb 2020-06-05): Figure out what causes/which versions produce
+    #   the backdrop rect in which format.
     backdrop_rect = re.search(r'</style>\s*<rect\s+fill="white"', html_tag) or (
         re.search(r'</style>\s*<rect\s+class="backdrop"', html_tag)
         and re.search(r"rect\.backdrop\s*\{\s*fill:\s*white", html_tag)
