@@ -11,10 +11,11 @@ import typing as typ
 import hashlib
 import logging
 
-import markdown_svgbob.wrapper as wrapper
 from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
 from markdown.postprocessors import Postprocessor
+
+import markdown_svgbob.wrapper as wrapper
 
 try:
     from urllib.parse import quote
