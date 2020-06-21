@@ -5,6 +5,11 @@
 # Copyright (c) 2019 Manuel Barkhau (mbarkhau@gmail.com) - MIT License
 # SPDX-License-Identifier: MIT
 
+# pytest fixtures work this way
+# pylint: disable=redefined-outer-name
+# for wrp._get_pkg_bin_path
+# pylint: disable=protected-access
+
 from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
@@ -119,8 +124,8 @@ def test_determinism_svg():
 def test_basic_svg():
     fig_data = markdown_svgbob.text2svg(BASIC_FIG_TXT)
 
-    # with open("debug_img_output_svgbob.svg", mode='wb') as fh:
-    #     fh.write(fig_data)
+    # with open("debug_img_output_svgbob.svg", mode='wb') as fobj:
+    #     fobj.write(fig_data)
 
     assert b"<svg" in fig_data
     assert b"</svg>" in fig_data
@@ -249,8 +254,8 @@ def test_postproc():
 
     assert '<svg class="bob"' in html_tag
     assert re.search(r"\.bg_fill\s*\{\s*fill:\s*white;", html_tag)
-    # TODO (mb 2020-06-05): Figure out what causes/which versions produce
-    #   the backdrop rect in which format.
+    # NOTE (mb 2020-06-05): Some versions of svgbob produce
+    #   a backdrop rect with a class, some with an inline fill.
     backdrop_rect = re.search(r'</style>\s*<rect\s+fill="white"', html_tag) or (
         re.search(r'</style>\s*<rect\s+class="backdrop"', html_tag)
         and re.search(r"rect\.backdrop\s*\{\s*fill:\s*white", html_tag)
@@ -287,8 +292,8 @@ def test_html_output():
         extensions=extensions,
         extension_configs={'markdown_svgbob': {'min_char_width': "60"}},
     )
-    with open("/tmp/svgbob.html", mode="w") as fh:
-        fh.write(result)
+    with open("/tmp/svgbob.html", mode="w") as fobj:
+        fobj.write(result)
 
 
 def test_ignore_non_bob_blocks():

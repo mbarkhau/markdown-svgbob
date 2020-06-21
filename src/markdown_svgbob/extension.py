@@ -4,6 +4,7 @@
 # Copyright (c) 2019 Manuel Barkhau (mbarkhau@gmail.com) - MIT License
 # SPDX-License-Identifier: MIT
 import re
+import copy
 import json
 import base64
 import typing as typ
@@ -163,14 +164,17 @@ def draw_bob(block_text: str, default_options: wrapper.Options = None) -> str:
     return svg2html(svg_data, tag_type=tag_type)
 
 
+DEFAULT_CONFIG = {
+    'tag_type'      : ["inline_svg", "Format to use (inline_svg|img_utf8_svg|img_base64_svg)"],
+    'bg_color'      : ["white"     , "Set the background color"],
+    'fg_color'      : ["black"     , "Set the foreground color"],
+    'min_char_width': [""          , "Minimum width of diagram in characters"],
+}
+
+
 class SvgbobExtension(Extension):
     def __init__(self, **kwargs) -> None:
-        self.config = {
-            'tag_type'      : ["inline_svg", "Format to use (inline_svg|img_utf8_svg|img_base64_svg)"],
-            'bg_color'      : ["white"     , "Set the background color"],
-            'fg_color'      : ["black"     , "Set the foreground color"],
-            'min_char_width': [""          , "Minimum width of diagram in characters"],
-        }
+        self.config = copy.deepcopy(DEFAULT_CONFIG)
         for name, options_text in wrapper.parse_options().items():
             self.config[name] = ["", options_text]
 

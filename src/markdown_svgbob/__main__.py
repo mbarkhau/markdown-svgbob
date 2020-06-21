@@ -51,8 +51,8 @@ def _selftest() -> ExitCode:
     if not svg_data:
         return 1
 
-    with open("test.svg", mode="wb") as fh:
-        fh.write(svg_data)
+    with open("test.svg", mode="wb") as fobj:
+        fobj.write(svg_data)
 
     print("Created test image to 'test.svg'")
     return 0

@@ -20,8 +20,13 @@ from markdown_svgbob.extension import SvgbobExtension
 get_svgbob_bin_path = get_bin_path
 
 
-def makeExtension(**kwargs) -> SvgbobExtension:
+def _make_extension(**kwargs) -> SvgbobExtension:
     return SvgbobExtension(**kwargs)
+
+
+# Name that conforms with the Markdown extension API
+# https://python-markdown.github.io/extensions/api/#dot_notation
+makeExtension = _make_extension
 
 
 __all__ = ['makeExtension', '__version__', 'get_bin_path', 'get_svgbob_bin_path', 'text2svg']
