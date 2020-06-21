@@ -184,7 +184,7 @@ class SvgbobExtension(Extension):
     def reset(self) -> None:
         self.images.clear()
 
-    def extendMarkdown(self, md, *args, **kwargs) -> None:
+    def extendMarkdown(self, md) -> None:
         preproc = SvgbobPreprocessor(md, self)
         md.preprocessors.register(preproc, name='svgbob_fenced_code_block', priority=50)
 
