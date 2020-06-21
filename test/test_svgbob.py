@@ -19,7 +19,6 @@ import re
 import textwrap
 
 import markdown as md
-
 import markdown_svgbob
 import markdown_svgbob.wrapper as wrp
 import markdown_svgbob.extension as ext

@@ -11,11 +11,10 @@ import typing as typ
 import hashlib
 import logging
 
+import markdown_svgbob.wrapper as wrapper
 from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
 from markdown.postprocessors import Postprocessor
-
-import markdown_svgbob.wrapper as wrapper
 
 try:
     from urllib.parse import quote
@@ -201,20 +200,32 @@ class SvgbobPreprocessor(Preprocessor):
         super(SvgbobPreprocessor, self).__init__(md)
         self.ext: SvgbobExtension = ext
 
-    def run(self, lines: typ.List[str]) -> typ.List[str]:
-        default_options: wrapper.Options = {
+    @property
+    def default_options(self) -> wrapper.Options:
+        options: wrapper.Options = {
             'tag_type'      : self.ext.getConfig('tag_type'      , 'inline_svg'),
             'min_char_width': self.ext.getConfig('min_char_width', ""),
         }
         for name in self.ext.config.keys():
             val = self.ext.getConfig(name, "")
             if val != "":
-                default_options[name] = val
+                options[name] = val
+        return options
 
+    def _make_tag_for_block(self, block_lines: typ.List[str]) -> str:
+        block_text = "\n".join(block_lines).rstrip()
+        img_tag    = draw_bob(block_text, self.default_options)
+        img_id     = make_marker_id(img_tag)
+        marker_tag = f"<p id='svgbob{img_id}'>svgbob{img_id}</p>"
+        tag_text   = f"<p>{img_tag}</p>"
+
+        self.ext.images[marker_tag] = tag_text
+        return marker_tag
+
+    def _iter_out_lines(self, lines: typ.List[str]) -> typ.Iterable[str]:
         is_in_fence          = False
         expected_close_fence = "```"
 
-        out_lines  : typ.List[str] = []
         block_lines: typ.List[str] = []
 
         for line in lines:
@@ -225,16 +236,9 @@ class SvgbobPreprocessor(Preprocessor):
                     continue
 
                 is_in_fence = False
-                block_text  = "\n".join(block_lines).rstrip()
+                marker_tag  = self._make_tag_for_block(block_lines)
                 del block_lines[:]
-
-                img_tag  = draw_bob(block_text, default_options)
-                img_id   = make_marker_id(img_tag)
-                marker   = f"<p id='svgbob{img_id}'>svgbob{img_id}</p>"
-                tag_text = f"<p>{img_tag}</p>"
-
-                out_lines.append(marker)
-                self.ext.images[marker] = tag_text
+                yield marker_tag
             else:
                 fence_match = BLOCK_RE.match(line)
                 if fence_match:
@@ -242,15 +246,16 @@ class SvgbobPreprocessor(Preprocessor):
                     expected_close_fence = fence_match.group(1)
                     block_lines.append(line)
                 else:
-                    out_lines.append(line)
+                    yield line
 
-        return out_lines
+    def run(self, lines: typ.List[str]) -> typ.List[str]:
+        return list(self._iter_out_lines(lines))
 
 
 # NOTE (mb):
 #   Q: Why this business with the Postprocessor? Why
-#   not just do `out_lines.append(tag_text)` and save
-#   the hassle of `self.ext.images[marker] = tag_text` ?
+#   not just do `yield tag_text` and save the hassle
+#   of `self.ext.math_html[marker_tag] = tag_text` ?
 #   A: Maybe there are other processors that can't be
 #   trusted to leave the inserted markup alone. Maybe
 #   the inserted markup could be incorrectly parsed as
@@ -263,11 +268,11 @@ class SvgbobPostprocessor(Postprocessor):
         self.ext: SvgbobExtension = ext
 
     def run(self, text: str) -> str:
-        for marker, img in self.ext.images.items():
-            wrapped_marker = "<p>" + marker + "</p>"
+        for marker_tag, img in self.ext.images.items():
+            wrapped_marker = "<p>" + marker_tag + "</p>"
             if wrapped_marker in text:
                 text = text.replace(wrapped_marker, img)
-            elif marker in text:
-                text = text.replace(marker, img)
+            elif marker_tag in text:
+                text = text.replace(marker_tag, img)
 
         return text
