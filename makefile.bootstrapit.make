@@ -345,15 +345,7 @@ mypy:
 .PHONY: pylint
 pylint:
 	@printf "pylint ..\n";
-	@$(DEV_ENV)/bin/pylint --jobs=4 --output-format=colorized --score=no \
-		 --disable=C0103,C0301,C0330,C0326,C0330,C0411,R0903,W1619,W1618,W1203 \
-		 --extension-pkg-whitelist=ujson,lxml,PIL,numpy,pandas,sklearn,pyblake2 \
-		 src/
-	@$(DEV_ENV)/bin/pylint --jobs=4 --output-format=colorized --score=no \
-		 --disable=C0103,C0111,C0301,C0330,C0326,C0330,C0411,R0903,W1619,W1618,W1203 \
-		 --extension-pkg-whitelist=ujson,lxml,PIL,numpy,pandas,sklearn,pyblake2 \
-		 test/
-
+	@$(DEV_ENV)/bin/pylint --rcfile=setup.cfg src/ test/
 	@printf "\e[1F\e[9C ok\n"
 
 
@@ -365,7 +357,9 @@ test:
 	@rm -rf "test/__pycache__";
 
 	# First we test the local source tree using the dev environment
-	ENV=$${ENV-dev} PYTHONPATH=src/:vendor/:$$PYTHONPATH \
+	ENV=$${ENV-dev} \
+		PYTHONPATH=src/:vendor/:$$PYTHONPATH \
+		PATH=$(DEV_ENV)/bin:$$PATH \
 		$(DEV_ENV_PY) -m pytest -v \
 		--doctest-modules \
 		--verbose \
@@ -464,7 +458,9 @@ activate:
 ## Drop into an ipython shell with correct env variables set
 .PHONY: ipy
 ipy:
-	@ENV=$${ENV-dev} PYTHONPATH=src/:vendor/:$$PYTHONPATH \
+	@ENV=$${ENV-dev} \
+		PYTHONPATH=src/:vendor/:$$PYTHONPATH \
+		PATH=$(DEV_ENV)/bin:$$PATH \
 		$(DEV_ENV)/bin/ipython
 
 
@@ -475,10 +471,9 @@ devtest:
 	@rm -rf "src/__pycache__";
 	@rm -rf "test/__pycache__";
 
-	ENABLE_BACKTRACE=0 \
-		ENV=$${ENV-dev} \
-		PYTEST_SKIP=$${PYTEST_SKIP:-slow} \
+	ENV=$${ENV-dev} \
 		PYTHONPATH=src/:vendor/:$$PYTHONPATH \
+		PATH=$(DEV_ENV)/bin:$$PATH \
 		$(DEV_ENV_PY) -m pytest -v \
 		--doctest-modules \
 		--no-cov \
