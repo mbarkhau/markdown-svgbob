@@ -13,11 +13,15 @@ import subprocess as sp
 import markdown_svgbob
 
 # To enable pretty tracebacks:
-#   echo "export ENABLE_BACKTRACE=1;" >> ~/.bashrc
-if os.environ.get('ENABLE_BACKTRACE') == '1':
-    import backtrace
+#   echo "export ENABLE_RICH_TB=1;" >> ~/.bashrc
+if os.environ.get('ENABLE_RICH_TB') == '1':
+    try:
+        import rich.traceback
 
-    backtrace.hook(align=True, strip_path=True, enable_on_envvar_only=True)
+        rich.traceback.install()
+    except ImportError:
+        # don't fail just because of missing dev library
+        pass
 
 
 TEST_IMAGE = r"""
