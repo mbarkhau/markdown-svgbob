@@ -41,6 +41,7 @@ ExitCode = int
 
 
 def _selftest() -> ExitCode:
+    # pylint:disable=import-outside-toplevel  ; lazy import to improve cli responsiveness
     import markdown_svgbob.wrapper as wrp
 
     print("Command options:")
@@ -58,11 +59,12 @@ def _selftest() -> ExitCode:
     return 0
 
 
-def main(args: typ.List[str] = sys.argv[1:]) -> ExitCode:
+def main(args: typ.Sequence[str] = sys.argv[1:]) -> ExitCode:
     """Basic wrapper around the svgbob command.
 
     This is mostly just used for self testing.
     """
+    # pylint:disable=dangerous-default-value   ; mypy will detect if we mutate args
     if "--markdown-svgbob-selftest" in args:
         return _selftest()
 
@@ -71,7 +73,7 @@ def main(args: typ.List[str] = sys.argv[1:]) -> ExitCode:
         print("markdown-svgbob version: ", version)
 
     binpath = markdown_svgbob.get_bin_path()
-    return sp.call([str(binpath)] + args)
+    return sp.call([str(binpath)] + list(args))
 
 
 if __name__ == '__main__':

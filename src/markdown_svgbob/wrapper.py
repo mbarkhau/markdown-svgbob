@@ -112,6 +112,10 @@ ArgValue = typ.Union[str, int, float, bool]
 Options  = typ.Dict[str, ArgValue]
 
 
+class SvgbobException(Exception):
+    pass
+
+
 def text2svg(image_text: str, options: Options = None) -> bytes:
     binpath   = get_bin_path()
     cmd_parts = [str(binpath)]
@@ -163,20 +167,20 @@ def text2svg(image_text: str, options: Options = None) -> bytes:
                 + "svgbob_cli process ended with "
                 + f"code {ret_code} ({signame})"
             )
-            raise Exception(err_msg)
+            raise SvgbobException(err_msg)
         elif ret_code > 0:
             stdout  = read_output(proc.stdout)
             errout  = read_output(proc.stderr)
             output  = (stdout + "\n" + errout).strip()
             err_msg = f"Error processing svgbob image: {output}"
-            raise Exception(err_msg)
+            raise SvgbobException(err_msg)
 
     with tmp_output_file.open(mode="rb") as fobj:
         result = fobj.read()
 
     _cleanup_tmp_dir()
 
-    return result
+    return typ.cast(bytes, result)
 
 
 def _cleanup_tmp_dir() -> None:
