@@ -1,3 +1,10 @@
+<div align="center">
+<p align="center">
+  <img alt="logo" src="https://gitlab.com/mbarkhau/markdown-svgbob/-/raw/master/logo.png">
+</p>
+</div>
+
+
 # [markdown-svgbob][repo_ref]
 
 This is an extension for [Python Markdown](https://python-markdown.github.io/)
