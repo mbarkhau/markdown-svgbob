@@ -77,7 +77,7 @@ def main(args: typ.Sequence[str] = sys.argv[1:]) -> ExitCode:
         print("markdown-svgbob version: ", version)
 
     binpath = markdown_svgbob.get_bin_path()
-    return sp.call([str(binpath)] + list(args))
+    return sp.check_call([str(binpath)] + list(args))
 
 
 if __name__ == '__main__':
