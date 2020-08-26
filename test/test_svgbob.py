@@ -328,8 +328,14 @@ def test_ignore_non_bob_blocks():
         ~~~
         """
     )
-    result_a = md.markdown(md_text, extensions=DEFAULT_MKDOCS_EXTENSIONS + ['markdown_svgbob'],)
-    result_b = md.markdown(md_text, extensions=DEFAULT_MKDOCS_EXTENSIONS,)
+    result_a = md.markdown(
+        md_text,
+        extensions=DEFAULT_MKDOCS_EXTENSIONS + ['markdown_svgbob'],
+    )
+    result_b = md.markdown(
+        md_text,
+        extensions=DEFAULT_MKDOCS_EXTENSIONS,
+    )
     assert "bob" not in result_a
     assert "bob" not in result_b
 
