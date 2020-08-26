@@ -179,7 +179,7 @@ class SvgbobExtension(Extension):
             self.config[name] = ["", options_text]
 
         self.images: typ.Dict[str, str] = {}
-        super(SvgbobExtension, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def reset(self) -> None:
         self.images.clear()
@@ -198,7 +198,7 @@ BLOCK_RE = re.compile(r"^(```|~~~)bob")
 
 class SvgbobPreprocessor(Preprocessor):
     def __init__(self, md, ext: SvgbobExtension) -> None:
-        super(SvgbobPreprocessor, self).__init__(md)
+        super().__init__(md)
         self.ext: SvgbobExtension = ext
 
     @property
@@ -265,7 +265,7 @@ class SvgbobPreprocessor(Preprocessor):
 
 class SvgbobPostprocessor(Postprocessor):
     def __init__(self, md, ext: SvgbobExtension) -> None:
-        super(SvgbobPostprocessor, self).__init__(md)
+        super().__init__(md)
         self.ext: SvgbobExtension = ext
 
     def run(self, text: str) -> str:
