@@ -1,7 +1,7 @@
 # This file is part of the markdown-svgbob project
 # https://gitlab.com/mbarkhau/markdown-svgbob
 #
-# Copyright (c) 2019 Manuel Barkhau (mbarkhau@gmail.com) - MIT License
+# Copyright (c) 2019-2020 Manuel Barkhau (mbarkhau@gmail.com) - MIT License
 # SPDX-License-Identifier: MIT
 import re
 import copy
@@ -23,7 +23,7 @@ except ImportError:
     from urllib import quote  # type: ignore
 
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def make_marker_id(text: str) -> str:
@@ -70,7 +70,9 @@ def _parse_min_char_width(options: wrapper.Options) -> int:
     try:
         return int(round(float(min_char_width)))
     except ValueError:
-        log.warning(f"Invalid argument for min_char_width. expected integer, got: {min_char_width}")
+        logger.warning(
+            f"Invalid argument for min_char_width. expected integer, got: {min_char_width}"
+        )
         return 0
 
 
@@ -174,7 +176,7 @@ DEFAULT_CONFIG = {
 
 class SvgbobExtension(Extension):
     def __init__(self, **kwargs) -> None:
-        self.config = copy.deepcopy(DEFAULT_CONFIG)
+        self.config: typ.Dict[str, typ.List[str]] = copy.deepcopy(DEFAULT_CONFIG)
         for name, options_text in wrapper.parse_options().items():
             self.config[name] = ["", options_text]
 
@@ -217,7 +219,7 @@ class SvgbobPreprocessor(Preprocessor):
         block_text = "\n".join(block_lines).rstrip()
         img_tag    = draw_bob(block_text, self.default_options)
         img_id     = make_marker_id(img_tag)
-        marker_tag = f"<p id='svgbob{img_id}'>svgbob{img_id}</p>"
+        marker_tag = f"<p id=\"tmp_md_svgbob{img_id}\">svgbob{img_id}</p>"
         tag_text   = f"<p>{img_tag}</p>"
 
         self.ext.images[marker_tag] = tag_text
@@ -270,10 +272,14 @@ class SvgbobPostprocessor(Postprocessor):
 
     def run(self, text: str) -> str:
         for marker_tag, img in self.ext.images.items():
-            wrapped_marker = "<p>" + marker_tag + "</p>"
-            if wrapped_marker in text:
-                text = text.replace(wrapped_marker, img)
-            elif marker_tag in text:
-                text = text.replace(marker_tag, img)
+            if marker_tag in text:
+                wrapped_marker = "<p>" + marker_tag + "</p>"
+                while marker_tag in text:
+                    if wrapped_marker in text:
+                        text = text.replace(wrapped_marker, img)
+                    else:
+                        text = text.replace(marker_tag, img)
+            else:
+                logger.warning(f"SvgbobPostprocessor couldn't find: {marker_tag}")
 
         return text

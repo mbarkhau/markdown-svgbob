@@ -1,7 +1,7 @@
 # This file is part of the markdown-svgbob project
 # https://gitlab.com/mbarkhau/markdown-svgbob
 #
-# Copyright (c) 2019 Manuel Barkhau (mbarkhau@gmail.com) - MIT License
+# Copyright (c) 2019-2020 Manuel Barkhau (mbarkhau@gmail.com) - MIT License
 # SPDX-License-Identifier: MIT
 
 import os
@@ -23,17 +23,8 @@ package_dir = {"": "src"}
 
 
 if any(arg.startswith("bdist") for arg in sys.argv):
-    try:
-        import lib3to6
-        package_dir = lib3to6.fix(package_dir)
-    except ImportError:
-        if sys.version_info < (3, 6):
-            raise
-        else:
-            sys.stderr.write((
-                "WARNING: Creating non-universal bdist of pycalver, "
-                "this should only be used for development.\n"
-            ))
+    import lib3to6
+    package_dir = lib3to6.fix(package_dir)
 
 
 install_requires = [
@@ -87,10 +78,7 @@ setuptools.setup(
         "Operating System :: Microsoft :: Windows",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Topic :: Software Development :: Libraries",

@@ -1,5 +1,12 @@
 # Changelog for https://gitlab.com/mbarkhau/markdown-svgbob
 
+## v202103.1015
+
+ - Fix related to [#14](https://gitlab.com/mbarkhau/markdown-katex/-/issues/14): Since `Markdown>=3.3` support for [Markdown in HTML][md_in_html] was broken.
+
+[md_in_html]: https://python-markdown.github.io/extensions/md_in_html/
+
+
 ## v202006.0015
 
  - Fix: `bg_color` not updated in some cases
