@@ -2,7 +2,7 @@
 # This file is part of the markdown-svgbob project
 # https://gitlab.com/mbarkhau/markdown-svgbob
 #
-# Copyright (c) 2019-2020 Manuel Barkhau (mbarkhau@gmail.com) - MIT License
+# Copyright (c) 2019-2021 Manuel Barkhau (mbarkhau@gmail.com) - MIT License
 # SPDX-License-Identifier: MIT
 import os
 import sys
