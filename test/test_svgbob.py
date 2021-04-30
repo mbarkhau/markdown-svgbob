@@ -110,9 +110,16 @@ HTMLTEST_TXT = HTMLTEST_TXT.replace("<figtxt>", BASIC_FIG_TXT)
 
 
 def test_regexp():
-    assert ext.BLOCK_RE.match(BASIC_BLOCK_TXT)
-    alt_block_text = BASIC_BLOCK_TXT.replace("```", "~~~")
-    assert ext.BLOCK_RE.match(alt_block_text)
+    block_texts = [
+        BASIC_BLOCK_TXT,
+        BASIC_BLOCK_TXT.replace("```", "~~~"),
+        BASIC_BLOCK_TXT.replace("```", "~~~~"),
+        BASIC_BLOCK_TXT.replace("```", "````"),
+    ]
+
+    for block_text in block_texts:
+        assert ext.BLOCK_START_RE.match(block_text)
+        assert ext.BLOCK_CLEAN_RE.match(block_text)
 
 
 def test_determinism_svg():
