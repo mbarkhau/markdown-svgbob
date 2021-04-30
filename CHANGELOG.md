@@ -1,5 +1,11 @@
 # Changelog for https://gitlab.com/mbarkhau/markdown-svgbob
 
+## v202104.1016
+
+ - Fix: Close file descriptiors of Popen
+ - Add support for blocks with extra backticks
+
+
 ## v202103.1015
 
  - Fix related to [#14](https://gitlab.com/mbarkhau/markdown-katex/-/issues/14): Since `Markdown>=3.3` support for [Markdown in HTML][md_in_html] was broken.
