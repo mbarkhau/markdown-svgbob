@@ -20,3 +20,48 @@ The recommended approach to using `pylint-ignore` is:
 3. If a message is a false positive, add a comment of this form to your code:
    `# pylint:disable=<symbol> ; explain why this is a false positive`
 
+
+# Overview
+
+ - [W0101: unreachable (1x)](#w0101-unreachable)
+ - [W0511: fixme (1x)](#w0511-fixme)
+
+
+# W0101: unreachable
+
+## File test/test_svgbob.py - Line 266 - W0101 (unreachable)
+
+- `message: Unreachable code`
+- `author : Manuel Barkhau <mbarkhau@gmail.com>`
+- `date   : 2021-07-22T10:24:31`
+
+```
+  257: def test_postproc():
+  ...
+  264:     return
+  265: 
+> 266:     assert '<svg class="bob"' in html_tag
+  267: 
+  268:     assert re.search(r"\.bg_fill\s*\{\s*fill:\s*white;", html_tag)
+```
+
+
+# W0511: fixme
+
+## File test/test_svgbob.py - Line 262 - W0511 (fixme)
+
+- `message: TODO (mb 2021-07-22): brittle test, perhaps switch to image diff`
+- `author : Manuel Barkhau <mbarkhau@gmail.com>`
+- `date   : 2021-07-22T10:24:31`
+
+```
+  257: def test_postproc():
+  ...
+  260:     html_tag = ext.draw_bob(BASIC_BLOCK_TXT)
+  261: 
+> 262:     # TODO (mb 2021-07-22): brittle test, perhaps switch to image diff
+  263:     #   based testing.
+  264:     return
+```
+
+

@@ -1,5 +1,5 @@
 #!/bin/bash
-sudo apt-get install clang-6.0 libclang1-6.0 libobjc-4.8-dev
+sudo apt-get install clang-6.0 libclang1-6.0 libobjc-7-dev libxml2-dev
 sudo ln -s /usr/bin/clang++-6.0 /usr/bin/clang++
 sudo ln -s /usr/bin/clang-6.0 /usr/bin/clang
 
