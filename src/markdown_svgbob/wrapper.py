@@ -1,5 +1,5 @@
 # This file is part of the markdown-svgbob project
-# https://gitlab.com/mbarkhau/markdown-svgbob
+# https://github.com/mbarkhau/markdown-svgbob
 #
 # Copyright (c) 2019-2021 Manuel Barkhau (mbarkhau@gmail.com) - MIT License
 # SPDX-License-Identifier: MIT

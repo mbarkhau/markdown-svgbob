@@ -1,4 +1,4 @@
-# Changelog for https://gitlab.com/mbarkhau/markdown-svgbob
+# Changelog for https://github.com/mbarkhau/markdown-svgbob
 
 ## v202107.1017
 

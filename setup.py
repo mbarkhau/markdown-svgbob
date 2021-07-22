@@ -1,5 +1,5 @@
 # This file is part of the markdown-svgbob project
-# https://gitlab.com/mbarkhau/markdown-svgbob
+# https://github.com/mbarkhau/markdown-svgbob
 #
 # Copyright (c) 2019-2020 Manuel Barkhau (mbarkhau@gmail.com) - MIT License
 # SPDX-License-Identifier: MIT
@@ -42,7 +42,7 @@ setuptools.setup(
     license="MIT",
     author="Manuel Barkhau",
     author_email="mbarkhau@gmail.com",
-    url="https://gitlab.com/mbarkhau/markdown-svgbob",
+    url="https://github.com/mbarkhau/markdown-svgbob",
     version="202104.1017",
     keywords="markdown svgbob extension",
     description="svgbob extension for Python Markdown",

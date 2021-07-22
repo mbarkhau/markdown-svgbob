@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # This file is part of markdown-svgbob.
-# https://gitlab.com/mbarkhau/markdown-svgbob
+# https://github.com/mbarkhau/markdown-svgbob
 #
 # Copyright (c) 2019 Manuel Barkhau (mbarkhau@gmail.com) - MIT License
 # SPDX-License-Identifier: MIT

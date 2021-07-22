@@ -77,9 +77,9 @@ The info string `bob` is chosen to match [spongedown](https://github.com/ivancer
 ## Development/Testing
 
 ```bash
-$ git clone https://gitlab.com/mbarkhau/markdown-svgbob
+$ git clone https://github.com/mbarkhau/markdown-svgbob
 $ cd markdown-svgbob
-$ make install
+$ make conda
 $ make lint mypy test
 ```
 
@@ -102,7 +102,7 @@ Valid options for `tag_type` are `inline_svg` (the default), `img_utf8_svg` and 
 The option `min_char_width` allows you to create diagrams of a uniform scale.
 
 
-[repo_ref]: https://gitlab.com/mbarkhau/markdown-svgbob
+[repo_ref]: https://github.com/mbarkhau/markdown-svgbob
 
 [github_build_img]: https://github.com/mbarkhau/markdown-svgbob/workflows/CI/badge.svg
 [github_build_ref]: https://github.com/mbarkhau/markdown-svgbob/actions?query=workflow%3ACI
