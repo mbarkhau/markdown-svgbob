@@ -1,5 +1,10 @@
 # Changelog for https://gitlab.com/mbarkhau/markdown-svgbob
 
+## v202107.1017
+
+ - Fix: False positive warning due to 'toc' extension.
+
+
 ## v202104.1016
 
  - Fix: Close file descriptiors of Popen

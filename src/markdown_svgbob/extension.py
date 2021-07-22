@@ -278,7 +278,7 @@ class SvgbobPostprocessor(Postprocessor):
                         text = text.replace(wrapped_marker, img)
                     else:
                         text = text.replace(marker_tag, img)
-            else:
+            elif 'class="toc"' not in text:
                 logger.warning(f"SvgbobPostprocessor couldn't find: {marker_tag}")
 
         return text
