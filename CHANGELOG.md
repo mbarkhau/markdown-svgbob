@@ -1,5 +1,14 @@
 # Changelog for https://github.com/mbarkhau/markdown-svgbob
 
+## v202109.1018
+
+ - Upgrade to svgbob 0.6.2 for Linux
+ - Packaging with lib3to6==202108.1048
+
+I can't get newer binaries for windows or macos, contributions to
+svgbob would be welcome. https://github.com/ivanceras/svgbob/issues/35
+
+
 ## v202107.1017
 
  - Fix: False positive warning due to 'toc' extension.

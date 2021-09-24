@@ -41,7 +41,7 @@ twine
 md-toc
 straitjacket>=v202008.1016
 bumpver
-lib3to6
+lib3to6>=202108.1048b3
 
 # needed for mypy coverage report
 lxml

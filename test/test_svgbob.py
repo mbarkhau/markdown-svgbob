@@ -304,7 +304,7 @@ def test_html_output():
         extensions=extensions,
         extension_configs={'markdown_svgbob': {'min_char_width': "60"}},
     )
-    with open("/tmp/svgbob.html", mode="w") as fobj:
+    with open("/tmp/svgbob.html", mode="w", encoding="utf-8") as fobj:
         fobj.write(result)
 
 

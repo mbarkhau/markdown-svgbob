@@ -1,7 +1,7 @@
 # This file is part of the markdown-svgbob project
 # https://github.com/mbarkhau/markdown-svgbob
 #
-# Copyright (c) 2019-2020 Manuel Barkhau (mbarkhau@gmail.com) - MIT License
+# Copyright (c) 2019-2021 Manuel Barkhau (mbarkhau@gmail.com) - MIT License
 # SPDX-License-Identifier: MIT
 
 import os
@@ -19,12 +19,11 @@ def read(*sub_paths):
         return fh.read().decode("utf-8")
 
 
-package_dir = {"": "src"}
-
-
-if any(arg.startswith("bdist") for arg in sys.argv):
+try:
     import lib3to6
-    package_dir = lib3to6.fix(package_dir)
+    distclass = lib3to6.Distribution
+except ImportError:
+    distclass = setuptools.dist.Distribution
 
 
 install_requires = [
@@ -49,22 +48,17 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=["markdown_svgbob"],
-    package_dir=package_dir,
-    package_data={
-        "markdown_svgbob": [
-            os.path.join("bin", "svgbob_*"),
-        ],
-    },
+    package_dir={"": "src"},
     include_package_data=True,
     install_requires=install_requires,
     python_requires=">=2.7",
+    distclass=distclass,
     zip_safe=True,
     entry_points={
         'markdown.extensions': [
             'markdown_svgbob = markdown_svgbob.extension:SvgbobExtension',
         ]
     },
-
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         "Development Status :: 4 - Beta",
