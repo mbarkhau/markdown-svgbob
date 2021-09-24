@@ -190,17 +190,20 @@ def test_encoding():
 
 def test_svgbob_options():
     fig_data_default = markdown_svgbob.text2svg(BASIC_FIG_TXT)
+    fig_text_default = fig_data_default.decode("utf-8")
 
-    assert b"stroke-width:2" in fig_data_default
-    assert b"stroke-width:4" not in fig_data_default
+    assert re.search(r"stroke-width:\s*2",fig_text_default)
+    assert not re.search(r"stroke-width:\s*4",fig_text_default)
 
     options  = {'stroke-width': 4}
     fig_data = markdown_svgbob.text2svg(BASIC_FIG_TXT, options)
-    assert b"stroke-width:2" not in fig_data
-    assert b"stroke-width:4" in fig_data
+    fig_text = fig_data.decode("utf-8")
 
-    assert b"<svg" in fig_data
-    assert b"</svg>" in fig_data
+    assert not re.search(r"stroke-width:\s*2",fig_text)
+    assert re.search(r"stroke-width:\s*4",fig_text)
+
+    assert "<svg" in fig_text
+    assert "</svg>" in fig_text
 
     result = md.markdown(OPTIONS_BLOCK_TXT, extensions=['markdown_svgbob'])
 
