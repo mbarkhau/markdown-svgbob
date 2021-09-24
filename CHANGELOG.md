@@ -1,6 +1,6 @@
 # Changelog for https://github.com/mbarkhau/markdown-svgbob
 
-## v202109.1019
+## v202109.1020
 
  - Upgrade to svgbob 0.6.2 for Linux
  - Packaging with lib3to6==202108.1048
