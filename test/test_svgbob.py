@@ -192,15 +192,15 @@ def test_svgbob_options():
     fig_data_default = markdown_svgbob.text2svg(BASIC_FIG_TXT)
     fig_text_default = fig_data_default.decode("utf-8")
 
-    assert re.search(r"stroke-width:\s*2",fig_text_default)
-    assert not re.search(r"stroke-width:\s*4",fig_text_default)
+    assert re.search(r"stroke-width:\s*2", fig_text_default)
+    assert not re.search(r"stroke-width:\s*4", fig_text_default)
 
     options  = {'stroke-width': 4}
     fig_data = markdown_svgbob.text2svg(BASIC_FIG_TXT, options)
     fig_text = fig_data.decode("utf-8")
 
-    assert not re.search(r"stroke-width:\s*2",fig_text)
-    assert re.search(r"stroke-width:\s*4",fig_text)
+    assert not re.search(r"stroke-width:\s*2", fig_text)
+    assert re.search(r"stroke-width:\s*4", fig_text)
 
     assert "<svg" in fig_text
     assert "</svg>" in fig_text
