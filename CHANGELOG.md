@@ -2,7 +2,7 @@
 
 ## v202112.1021
 
- - Upgrade to svgbob 0.5.5
+ - Upgrade svgbob binaries to 0.5.5
 
 
 ## v202109.1020
