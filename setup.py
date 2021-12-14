@@ -51,7 +51,7 @@ setuptools.setup(
     package_dir={"": "src"},
     include_package_data=True,
     install_requires=install_requires,
-    python_requires=">=2.7",
+    python_requires=">=3.6",
     distclass=distclass,
     zip_safe=True,
     entry_points={
@@ -71,7 +71,6 @@ setuptools.setup(
         "Operating System :: MacOS :: MacOS X",
         "Operating System :: Microsoft :: Windows",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
