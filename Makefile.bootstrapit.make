@@ -57,7 +57,7 @@ CONDA_ENV_BIN_PYTHON_PATHS := \
 empty :=
 literal_space := $(empty) $(empty)
 
-BDIST_WHEEL_PYTHON_TAG := py3
+BDIST_WHEEL_PYTHON_TAG := py2.py3
 
 SDIST_FILE_CMD = ls -1t dist/*.tar.gz | head -n 1
 
