@@ -29,7 +29,7 @@ MODULE_NAME := $(shell echo $(subst -,_,$(PACKAGE_NAME)) | tr A-Z a-z)
 PLATFORM = $(shell uname -s)
 
 # miniconda is shared between projects
-CONDA_ROOT := $(shell if [[ -d /opt/conda/envs ]]; then echo "/opt/conda"; else echo "$$HOME/miniconda3"; fi;)
+CONDA_ROOT := $(shell if [[ -d /opt/conda/envs ]]; then echo "/opt/conda"; else echo "$${HOME}/miniconda3"; fi;)
 CONDA_BIN := $(CONDA_ROOT)/bin/conda
 
 ENV_PREFIX := $(CONDA_ROOT)/envs
@@ -57,7 +57,7 @@ CONDA_ENV_BIN_PYTHON_PATHS := \
 empty :=
 literal_space := $(empty) $(empty)
 
-BDIST_WHEEL_PYTHON_TAG := py2.py3
+BDIST_WHEEL_PYTHON_TAG := py3
 
 SDIST_FILE_CMD = ls -1t dist/*.tar.gz | head -n 1
 
@@ -156,14 +156,14 @@ build/deps.txt: build/envs.txt requirements/*.txt
 .PHONY: help
 help:
 	@awk '{ \
-			if ($$0 ~ /^.PHONY: [a-zA-Z\-\_0-9]+$$/) { \
+			if ($$0 ~ /^.PHONY: [a-zA-Z\-_0-9]+$$/) { \
 				helpCommand = substr($$0, index($$0, ":") + 2); \
 				if (helpMessage) { \
 					printf "\033[36m%-20s\033[0m %s\n", \
 						helpCommand, helpMessage; \
 					helpMessage = ""; \
 				} \
-			} else if ($$0 ~ /^[a-zA-Z\-\_0-9.\/]+:/) { \
+			} else if ($$0 ~ /^[a-zA-Z\-_0-9.\/]+:/) { \
 				helpCommand = substr($$0, 0, index($$0, ":")); \
 				if (helpMessage) { \
 					printf "\033[36m%-20s\033[0m %s\n", \
@@ -181,11 +181,11 @@ help:
 				helpMessage = ""; \
 			} \
 		}' \
-		makefile.bootstrapit.make makefile
+		Makefile.bootstrapit.make Makefile
 
 	@if [[ ! -f $(DEV_ENV_PY) ]]; then \
 	echo "Missing python interpreter at $(DEV_ENV_PY) !"; \
-	echo "You problably want to first setup the virtual environments:"; \
+	echo "You probably want to first setup the virtual environments:"; \
 	echo ""; \
 	echo "    make conda"; \
 	echo ""; \
@@ -194,7 +194,7 @@ help:
 
 	@if [[ ! -f $(CONDA_BIN) ]]; then \
 	echo "No conda installation found!"; \
-	echo "You problably want to first setup the virtual environments:"; \
+	echo "You probably want to first setup the virtual environments:"; \
 	echo ""; \
 	echo "    make conda"; \
 	echo ""; \
@@ -208,14 +208,14 @@ helpverbose:
 	@printf "Available make targets for \033[97m$(PKG_NAME)\033[0m:\n";
 
 	@awk '{ \
-			if ($$0 ~ /^.PHONY: [a-zA-Z\-\_0-9]+$$/) { \
+			if ($$0 ~ /^.PHONY: [a-zA-Z\-_0-9]+$$/) { \
 				helpCommand = substr($$0, index($$0, ":") + 2); \
 				if (helpMessage) { \
 					printf "\033[36m%-20s\033[0m %s\n", \
 						helpCommand, helpMessage; \
 					helpMessage = ""; \
 				} \
-			} else if ($$0 ~ /^[a-zA-Z\-\_0-9.\/]+:/) { \
+			} else if ($$0 ~ /^[a-zA-Z\-_0-9.\/]+:/) { \
 				helpCommand = substr($$0, 0, index($$0, ":")); \
 				if (helpMessage) { \
 					printf "\033[36m%-20s\033[0m %s\n", \
@@ -235,7 +235,7 @@ helpverbose:
 				helpMessage = ""; \
 			} \
 		}' \
-		makefile.bootstrapit.make makefile
+		Makefile.bootstrapit.make Makefile
 
 
 ## -- Project Setup --
@@ -300,7 +300,6 @@ git_hooks:
 lint_isort:
 	@printf "isort ...\n"
 	@$(DEV_ENV)/bin/isort \
-		--recursive \
 		--check-only \
 		--line-width=$(MAX_LINE_LEN) \
 		--project $(MODULE_NAME) \
@@ -394,7 +393,7 @@ test:
 		--cov-report term \
 		--html=reports/pytest/index.html \
 		--junitxml reports/pytest.xml \
-		-k "$${PYTEST_FILTER}" \
+		-k "$${PYTEST_FILTER-$${FLTR}}" \
 		$(shell cd src/ && ls -1 */__init__.py | awk '{ sub(/\/__init__.py/, "", $$1); print "--cov "$$1 }') \
 		test/ src/;
 
@@ -410,7 +409,10 @@ test:
 		env_py=$${env_py_paths[i]}; \
 		$${env_py} -m pip uninstall --yes $(PKG_NAME); \
 		$${env_py} -m pip install --upgrade build/test_wheel/*.whl; \
-		PYTHONPATH="" ENV=$${ENV-dev} $${env_py} -m pytest test/; \
+		PYTHONPATH="" ENV=$${ENV-dev} \
+		$${env_py} -m pytest \
+		-k "$${PYTEST_FILTER-$${FLTR}}" \
+		test/; \
 	done;
 
 	@rm -rf ".pytest_cache";
@@ -422,7 +424,6 @@ test:
 .PHONY: fmt_isort
 fmt_isort:
 	@$(DEV_ENV)/bin/isort \
-		--recursive \
 		--line-width=$(MAX_LINE_LEN) \
 		--project $(MODULE_NAME) \
 		src/ test/;
@@ -520,7 +521,7 @@ devtest:
 		--capture=no \
 		--exitfirst \
 		--failed-first \
-		-k "$${PYTEST_FILTER}" \
+		-k "$${PYTEST_FILTER-$${FLTR}}" \
 		test/ src/;
 
 	@rm -rf "src/__pycache__";

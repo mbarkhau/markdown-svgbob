@@ -1,18 +1,13 @@
 # Stages:
 #   root       : Common image, both for the builder and for the final image.
 #                This contains only minimal dependencies required in both cases
-#                for miniconda and the makefile.
-#   env_builder: stage in which the conda envrionment is created
+#                for miniconda and the Makefile.
+#   env_builder: stage in which the conda environment is created
 #                and dependencies are installed
 #   base       : the final image containing only the required environment files,
 #                and none of the infrastructure required to generate them.
 
 FROM registry.gitlab.com/mbarkhau/bootstrapit/env_builder AS builder
-
-# gcc required for cmarkgfm on python3.8
-# https://github.com/theacodes/cmarkgfm/issues/22
-RUN apt-get update
-RUN apt-get install -y gcc
 
 RUN mkdir /root/.ssh/ && \
     ssh-keyscan gitlab.com >> /root/.ssh/known_hosts && \
@@ -37,8 +32,8 @@ RUN if ! test -z "${ENV_SSH_PRIVATE_RSA_KEY}"; then \
 ADD requirements/ requirements/
 ADD scripts/ scripts/
 
-ADD makefile.bootstrapit.make makefile.bootstrapit.make
-ADD makefile makefile
+ADD Makefile.bootstrapit.make Makefile.bootstrapit.make
+ADD Makefile Makefile
 
 # install envs (relatively stable)
 ADD requirements/conda.txt requirements/conda.txt

@@ -20,7 +20,6 @@ DEVELOPMENT_PYTHON_VERSION := python=3.9
 # - pypy3.5
 SUPPORTED_PYTHON_VERSIONS := python=3.9 python=3.6
 
-
 include Makefile.bootstrapit.make
 
 ## -- Extra/Custom/Project Specific Tasks --
