@@ -1,5 +1,10 @@
 # Changelog for https://github.com/mbarkhau/markdown-svgbob
 
+## v202112.1021
+
+ - Upgrade to svgbob 0.5.5
+
+
 ## v202109.1020
 
  - Upgrade to svgbob 0.6.2 for Linux

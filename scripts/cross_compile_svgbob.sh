@@ -11,6 +11,7 @@ git checkout master
 git pull
 
 TAG=$(git tag -l --sort=taggerdate | grep -E "^v[0-9]+\.[0-9]+.[0-9]+$" | sort --version-sort | tail -n 1)
+TAG=0.5.5
 echo $TAG
 git checkout $TAG
 
