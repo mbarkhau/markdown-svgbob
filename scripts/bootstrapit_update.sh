@@ -28,7 +28,7 @@ if [[ ${BOOTSTRAPIT_DEBUG-0} == 0 ]]; then
     if [[ -f "$PROJECT_DIR/.git/config" ]]; then
         cd "$PROJECT_DIR";
         if [[ $( git diff -s --exit-code || echo "$?" ) -gt 0 ]]; then
-            echo "ABORTING!: Your repo has local changes which are not comitted."
+            echo "ABORTING!: Your repo has local changes which are not committed."
             echo "To avoid overwriting these changes, please commit your changes."
             exit 1;
         fi
@@ -72,6 +72,20 @@ if [[ -f "makefile.extra.make" && -f "makefile.config.make" ]]; then
     git add makefile.bootstrapit.make;
 
     printf "\nNow the 'makefile' is yours and the bootstrapit targets are in makefile.bootstrapit.make"
+    exit 1
+fi
+
+# One time update of makefile capitalization
+if [[ -f "makefile" && -f "makefile.bootstrapit.make" ]]; then
+    printf "Change capitalization of makefile -> Makefile  # because too many rustled jimmies\n\n"
+    printf "  mv makefile Makefile\n"
+    printf "  mv makefile.bootstrapit.make Makefile.bootstrapit.make\n"
+    sed -i 's/include makefile.bootstrapit.make/include Makefile.bootstrapit.make/g' makefile
+    git add makefile
+    git mv makefile Makefile;
+    git mv makefile.bootstrapit.make Makefile.bootstrapit.make;
+
+    printf "Please commit the renamed files and run bootstrapit_update.sh again."
     exit 1
 fi
 
@@ -346,9 +360,7 @@ elif [[ -z "${IGNORE_IF_EXISTS[*]}" ]]; then
         "CHANGELOG.md"
         "README.md"
         "setup.py"
-        "makefile"
         "requirements/pypi.txt"
-        "requirements/development.txt"
         "requirements/conda.txt"
         "requirements/vendor.txt"
         "src/${MODULE_NAME}/__init__.py"
@@ -398,8 +410,8 @@ copy_template MANIFEST.in;
 copy_template setup.py;
 copy_template setup.cfg;
 
-copy_template makefile;
-copy_template makefile.bootstrapit.make;
+copy_template Makefile;
+copy_template Makefile.bootstrapit.make;
 copy_template activate;
 copy_template docker_base.Dockerfile;
 copy_template Dockerfile;
