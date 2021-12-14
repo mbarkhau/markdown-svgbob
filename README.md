@@ -43,9 +43,9 @@ $ pip install markdown-svgbob
 
 This package includes the following binaries:
 
- - `svgbob_0.4.1_x86_64-Darwin`
- - `svgbob_0.4.1_x86_64-Linux`
- - `svgbob_0.4.1_x86_64-Windows`
+ - `svgbob_0.5.5_x86_64-Darwin`
+ - `svgbob_0.5.5_x86_64-Linux`
+ - `svgbob_0.5.5_x86_64-Windows.exe`
 
 If you are on another platform, or want to use a more recent version of `svgbob_cli`, you will need to install rust and then svgbob via cargo.
 
@@ -62,7 +62,7 @@ This extension will always use the installed version of svgbob if it is availabl
 In your markdown text you can define the block:
 
     ```bob
-             .---.
+         .---.
         /-o-/--
      .-/ / /->
     ( *  \/
