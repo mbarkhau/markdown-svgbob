@@ -606,4 +606,4 @@ docker_build:
 		--tag $(DOCKER_BASE_IMAGE) \
 		.; \
 
-	# docker push $(DOCKER_BASE_IMAGE)
+	docker push $(DOCKER_BASE_IMAGE)
