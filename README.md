@@ -11,7 +11,7 @@ This is an extension for [Python Markdown](https://python-markdown.github.io/)
 which renders diagrams using [svgbob](https://github.com/ivanceras/svgbob).
 
 You can try it out using the [Svgbob Editor](https://ivanceras.github.io/svgbob-editor/)
-or the [AsciiGrid Editor](https://mbarkhau.keybase.pub/asciigrid/).
+or the [AsciiGrid Editor](https://asciigrid.litprog.dev).
 
 Project/Repo:
 
