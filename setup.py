@@ -42,7 +42,7 @@ setuptools.setup(
     author="Manuel Barkhau",
     author_email="mbarkhau@gmail.com",
     url="https://github.com/mbarkhau/markdown-svgbob",
-    version="202112.1022",
+    version="202406.1023",
     keywords="markdown svgbob extension",
     description="svgbob extension for Python Markdown",
     long_description=long_description,

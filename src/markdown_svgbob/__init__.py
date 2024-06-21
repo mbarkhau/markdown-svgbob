@@ -1,7 +1,7 @@
 # This file is part of the markdown-svgbob project
 # https://github.com/mbarkhau/markdown-svgbob
 #
-# Copyright (c) 2019-2021 Manuel Barkhau (mbarkhau@gmail.com) - MIT License
+# Copyright (c) 2019-2024 Manuel Barkhau (mbarkhau@gmail.com) - MIT License
 # SPDX-License-Identifier: MIT
 """markdown_svgbob extension.
 
@@ -10,7 +10,7 @@ uses svgbob to generate images from ascii
 diagrams in fenced code blocks.
 """
 
-__version__ = "v202112.1022"
+__version__ = "v202406.1023"
 
 
 from markdown_svgbob.wrapper import text2svg
