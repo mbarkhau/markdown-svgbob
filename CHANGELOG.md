@@ -1,5 +1,10 @@
 # Changelog for https://github.com/mbarkhau/markdown-svgbob
 
+## v202406.1023
+
+ - fix requirements specifier
+
+
 ## v202112.1022
 
  - Upgrade svgbob binaries to 0.5.5
